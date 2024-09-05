@@ -160,7 +160,7 @@ def main() -> None:
 
     for token in tokens:
         if token.type == TokenType.EOF:
-            print(f"{token.type} null")
+            print(f"{token.type}  null")
         else:
             # Ensure 'null' is used for None values
             literal = 'null' if token.literal is None else token.literal
