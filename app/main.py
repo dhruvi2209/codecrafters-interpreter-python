@@ -26,13 +26,18 @@ def main():
     while i < len(file_contents):
         char = file_contents[i]
 
-        if char == '/':
+        if char in ' \t':  # Skip whitespace (space and tab)
+            i += 1
+            continue
+
+        if char == '\n':  # Handle newlines
+            line += 1
+        elif char == '/':
             if i + 1 < len(file_contents) and file_contents[i + 1] == '/':
                 # Skip to the end of the line for comments
                 i += 1
                 while i < len(file_contents) and file_contents[i] != '\n':
                     i += 1
-                # Continue to the next line after the comment
                 if i < len(file_contents) and file_contents[i] == '\n':
                     line += 1
             else:
