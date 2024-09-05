@@ -146,7 +146,7 @@ class Scanner:
 
 def main() -> None:
     if len(sys.argv) != 2:
-        print("Usage: python scanner.py <source file>")
+        print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
         sys.exit(64)
 
     filename = sys.argv[1]
