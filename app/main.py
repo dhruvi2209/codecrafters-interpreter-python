@@ -93,6 +93,7 @@ class Scanner:
                 self.line += 1
         else:
             Lox.error(self.line, f"Unexpected character: {char}")
+            self.error_occurred = True  # Mark error occurred
 
     def handle_slash(self) -> None:
         if self.match("/"):
@@ -145,7 +146,6 @@ class Scanner:
 
     def is_at_end(self) -> bool:
         return self.current >= len(self.source)
-
 def main() -> None:
     if len(sys.argv) != 3 or sys.argv[1] != 'tokenize':
         print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
@@ -162,7 +162,6 @@ def main() -> None:
         if token.type == TokenType.EOF:
             print(f"{token.type}  null")
         else:
-            # Ensure 'null' is used for None values
             literal = 'null' if token.literal is None else token.literal
             print(f"{token.type} {token.lexeme} {literal}")
 
