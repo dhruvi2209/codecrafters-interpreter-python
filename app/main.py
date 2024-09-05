@@ -50,7 +50,7 @@ class Scanner:
             "{": lambda: self.add_token(TokenType.LEFT_BRACE),
             "}": lambda: self.add_token(TokenType.RIGHT_BRACE),
             ",": lambda: self.add_token(TokenType.COMMA),
-            ".": lambda: self.add_token(TokenType.DOT),
+            ".": lambda: self.handle_dot(),
             "-": lambda: self.add_token(TokenType.MINUS),
             "+": lambda: self.add_token(TokenType.PLUS),
             ";": lambda: self.add_token(TokenType.SEMICOLON),
@@ -93,7 +93,32 @@ class Scanner:
                 self.line += 1
         else:
             Lox.error(self.line, f"Unexpected character: {char}")
-            self.error_occurred = True  # Mark error occurred
+
+    def handle_dot(self) -> None:
+        if self.peek().isdigit():
+            self.number()
+        else:
+            self.add_token(TokenType.DOT)
+
+    def number(self) -> None:
+        while self.peek().isdigit():
+            self.advance()
+
+        if self.peek() == '.' and self.is_digit(self.peek_next()):
+            self.advance()  # Consume the '.'
+            while self.peek().isdigit():
+                self.advance()
+
+        value = float(self.source[self.start:self.current])
+        self.add_token(TokenType.NUMBER, value)
+
+    def is_digit(self, c: str) -> bool:
+        return '0' <= c <= '9'
+
+    def peek_next(self) -> str:
+        if self.current + 1 >= len(self.source):
+            return '\0'
+        return self.source[self.current + 1]
 
     def handle_slash(self) -> None:
         if self.match("/"):
@@ -121,12 +146,6 @@ class Scanner:
         text = self.source[self.start:self.current]
         self.add_token(text.upper(), text)
 
-    def number(self) -> None:
-        while self.peek().isdigit():
-            self.advance()
-        text = self.source[self.start:self.current]
-        self.add_token("NUMBER", int(text))
-
     def advance(self) -> str:
         self.current += 1
         return self.source[self.current - 1]
@@ -146,6 +165,9 @@ class Scanner:
 
     def is_at_end(self) -> bool:
         return self.current >= len(self.source)
+
+    
+
 def main() -> None:
     if len(sys.argv) != 3 or sys.argv[1] != 'tokenize':
         print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
