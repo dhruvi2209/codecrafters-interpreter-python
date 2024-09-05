@@ -145,11 +145,11 @@ class Scanner:
         return self.current >= len(self.source)
 
 def main() -> None:
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3 or sys.argv[1] != 'tokenize':
         print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
         sys.exit(64)
 
-    filename = sys.argv[1]
+    filename = sys.argv[2]
     with open(filename, "r") as file:
         source = file.read()
 
