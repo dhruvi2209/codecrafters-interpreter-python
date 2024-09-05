@@ -158,7 +158,7 @@ def main() -> None:
 
     for token in tokens:
         if token.type == TokenType.EOF:
-            print(f"{token.type} null")
+            print(f"{token.type}  null")
         else:
             print(f"{token.type} {token.lexeme} {token.literal}")
 
