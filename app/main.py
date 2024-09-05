@@ -162,6 +162,9 @@ class Scanner:
 
     def add_token(self, type: str, literal: Optional[object] = None) -> None:
         text = self.source[self.start:self.current]
+        # Ensure that IDENTIFIER tokens have 'null' as the literal value
+        if type == TokenType.IDENTIFIER:
+            literal = None
         self.tokens.append(Token(type, text, literal, self.line))
 
     def peek(self) -> str:
@@ -169,6 +172,7 @@ class Scanner:
 
     def is_at_end(self) -> bool:
         return self.current >= len(self.source)
+
 
 def main() -> None:
     if len(sys.argv) != 3 or sys.argv[1] != 'tokenize':
