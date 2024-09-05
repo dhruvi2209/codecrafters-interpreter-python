@@ -86,6 +86,7 @@ class Scanner:
         return self.tokens
 
     def handle_string(self) -> None:
+        print(f"Handling string from position {self.start} to {self.current}")  # Debug print
         while self.peek() != '"' and not self.is_at_end():
             if self.peek() == "\n":
                 self.line += 1
@@ -95,14 +96,11 @@ class Scanner:
             return
         self.advance()  # Consume the closing ".
         value = self.source[self.start + 1 : self.current - 1]
+        print(f"String value: {value}")  # Debug print
         self.add_token(TokenType.STRING, value)
 
     def handle_plus(self) -> None:
-        # Check for string concatenation or addition
-        if self.peek() in ' \t':
-            self.add_token(TokenType.PLUS)
-        else:
-            self.add_token(TokenType.PLUS)
+        self.add_token(TokenType.PLUS)
 
     def handle_slash(self) -> None:
         if self.match('/'):
@@ -123,6 +121,7 @@ class Scanner:
 
     def add_token(self, type: str, literal: Optional[object] = None) -> None:
         text = self.source[self.start : self.current]
+        print(f"Adding token: {type} {literal}")  # Debug print
         self.tokens.append(Token(type, text, literal, self.line))
 
     def peek(self) -> str:
