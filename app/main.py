@@ -123,7 +123,7 @@ class Scanner:
 
         if char in self.token_actions:
             self.token_actions[char]()
-        elif char.isalpha():
+        elif char.isalpha() or char == "_":
             self.identifier()
         elif char.isdigit():
             self.number()
@@ -142,7 +142,7 @@ class Scanner:
 
         # Check if the identifier is a reserved word
         token_type = self.reserved_words.get(text, TokenType.IDENTIFIER)
-        self.add_token(token_type, None)  # Literal is None for identifiers
+        self.add_token(token_type)  # Literal is None for identifiers
 
     # Method to handle dot character
     def handle_dot(self) -> None:
@@ -230,18 +230,24 @@ def main() -> None:
         sys.exit(64)
 
     filename = sys.argv[2]
-    with open(filename, "r") as file:
-        source = file.read()
+    with open(filename, 'r') as f:
+        source_code = f.read()
 
-    scanner = Scanner(source)
+    scanner = Scanner(source_code)
     tokens = scanner.scan_tokens()
 
+    # Print tokens in the format expected by the tester
     for token in tokens:
-        literal = 'null' if token.literal is None else token.literal
-        print(f"{token.type} {token.lexeme} {literal}")
-
-    if scanner.error_occurred:
-        sys.exit(65)
+        token_type = token.type
+        token_lexeme = token.lexeme
+        if token_type == TokenType.IDENTIFIER:
+            print(f'{token_type}("{token_lexeme}")')
+        elif token_type in {TokenType.STRING, TokenType.NUMBER}:
+            print(f'{token_type}({token.literal})')
+        elif token_type == TokenType.EOF:
+            print(f'{token_type}()')
+        else:
+            print(token_type)
 
 if __name__ == "__main__":
     main()
