@@ -1,5 +1,8 @@
 import sys
 
+def report_error(line, message):
+    print(f"[line {line}] Error: {message}", file=sys.stderr)
+
 def main():
     print("Logs from your program will appear here!", file=sys.stderr)
 
@@ -16,6 +19,9 @@ def main():
 
     with open(filename) as file:
         file_contents = file.read()
+
+    line = 1
+    has_error = False
 
     # Scan for tokens
     for char in file_contents:
@@ -39,9 +45,16 @@ def main():
             print("SEMICOLON ; null")
         elif char == '*':
             print("STAR * null")
+        else:
+            report_error(line, f"Unexpected character: {char}")
+            has_error = True
 
     # End of file
     print("EOF  null")
+
+    # Exit with code 65 if there were errors
+    if has_error:
+        exit(65)
 
 if __name__ == "__main__":
     main()
