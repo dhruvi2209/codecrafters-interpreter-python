@@ -197,11 +197,10 @@ class Scanner:
             return
 
         self.advance()  # Consume the closing quote
-        # Include the quotes in the lexeme
-        lexeme = self.source[self.start:self.current]
-        # Extract the string content without quotes
-        value = self.source[self.start + 1:self.current - 1]
+        lexeme = self.source[self.start:self.current]  # Include the quotes
+        value = self.source[self.start + 1:self.current - 1]  # Strip the quotes for the literal value
         self.add_token(TokenType.STRING, value)
+
 
 
 
@@ -246,8 +245,8 @@ def main() -> None:
     # Print tokens in the format expected by the tester
     for token in tokens:
         if token.type == TokenType.STRING:
-            # Print the token with original quotes in the lexeme
-            print(f'{token.type} "{token.lexeme}" {token.literal}')
+            # Correctly format the lexeme with a single set of double quotes
+            print(f'{token.type} {token.lexeme} {token.literal}')
         else:
             literal = 'null' if token.literal is None else token.literal
             print(f'{token.type} {token.lexeme} {literal}')
