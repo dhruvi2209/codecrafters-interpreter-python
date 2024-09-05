@@ -118,6 +118,7 @@ class Scanner:
         self.tokens.append(Token(TokenType.EOF, "", None, self.line))
         return self.tokens
 
+
     def scan_token(self) -> None:
         char = self.advance()
 
@@ -133,6 +134,9 @@ class Scanner:
         else:
             Lox.error(self.line, f"Unexpected character: {char}")
             self.error_occurred = True
+
+        print(f"Processed character: {char}")
+
 
     def identifier(self) -> None:
         while self.peek().isalnum() or self.peek() == "_":
