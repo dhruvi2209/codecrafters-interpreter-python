@@ -86,6 +86,21 @@ def main():
                 i += 1
             else:
                 print("GREATER > null")
+        elif char == '"':
+            start = i
+            i += 1
+            while i < len(file_contents) and file_contents[i] != '"':
+                if file_contents[i] == '\n':
+                    line += 1
+                i += 1
+            if i < len(file_contents) and file_contents[i] == '"':
+                lexeme = file_contents[start:i+1]
+                literal = file_contents[start+1:i]
+                print(f"STRING {lexeme} {literal}")
+                i += 1
+            else:
+                report_error(line, "Unterminated string.")
+                has_error = True
         else:
             report_error(line, f"Unexpected character: {char}")
             has_error = True
