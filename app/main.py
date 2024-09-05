@@ -15,13 +15,19 @@ def main():
         print(f"Unknown command: {command}", file=sys.stderr)
         exit(1)
 
-    with open(filename) as file:
-        file_contents = file.read()
+    try:
+        with open(filename) as file:
+            file_contents = file.read()
+    except IOError as e:
+        print(f"Error reading file: {e}", file=sys.stderr)
+        exit(1)
 
     line = 1
     has_error = False
     i = 0
-    while i < len(file_contents):
+    length = len(file_contents)
+
+    while i < length:
         char = file_contents[i]
 
         if char in ' \t':  # Skip whitespace (space and tab)
@@ -31,13 +37,12 @@ def main():
         if char == '\n':  # Handle newlines
             line += 1
         elif char == '/':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '/':
+            if i + 1 < length and file_contents[i + 1] == '/':
                 # Skip to the end of the line for comments
-                i += 1
-                while i < len(file_contents) and file_contents[i] != '\n':
+                i += 2
+                while i < length and file_contents[i] != '\n':
                     i += 1
-                if i < len(file_contents) and file_contents[i] == '\n':
-                    line += 1
+                continue
             else:
                 print("SLASH / null")
         elif char == '(':
@@ -61,25 +66,25 @@ def main():
         elif char == '*':
             print("STAR * null")
         elif char == '=':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
+            if i + 1 < length and file_contents[i + 1] == '=':
                 print("EQUAL_EQUAL == null")
                 i += 1
             else:
                 print("EQUAL = null")
         elif char == '!':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
+            if i + 1 < length and file_contents[i + 1] == '=':
                 print("BANG_EQUAL != null")
                 i += 1
             else:
                 print("BANG ! null")
         elif char == '<':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
+            if i + 1 < length and file_contents[i + 1] == '=':
                 print("LESS_EQUAL <= null")
                 i += 1
             else:
                 print("LESS < null")
         elif char == '>':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
+            if i + 1 < length and file_contents[i + 1] == '=':
                 print("GREATER_EQUAL >= null")
                 i += 1
             else:
@@ -87,11 +92,11 @@ def main():
         elif char == '"':
             start = i
             i += 1
-            while i < len(file_contents) and file_contents[i] != '"':
+            while i < length and file_contents[i] != '"':
                 if file_contents[i] == '\n':
                     line += 1
                 i += 1
-            if i < len(file_contents) and file_contents[i] == '"':
+            if i < length and file_contents[i] == '"':
                 lexeme = file_contents[start:i+1]
                 literal = file_contents[start+1:i]
                 print(f"STRING {lexeme} {literal}")
@@ -113,3 +118,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
