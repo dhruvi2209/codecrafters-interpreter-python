@@ -26,6 +26,24 @@ class TokenType:
     IDENTIFIER = 'IDENTIFIER'
     EOF = 'EOF'
 
+    AND = 'AND'
+    CLASS = 'CLASS'
+    ELSE = 'ELSE'
+    FALSE = 'FALSE'
+    FOR = 'FOR'
+    FUN = 'FUN'
+    IF = 'IF'
+    NIL = 'NIL'
+    OR = 'OR'
+    PRINT = 'PRINT'
+    RETURN = 'RETURN'
+    SUPER = 'SUPER'
+    THIS = 'THIS'
+    TRUE = 'TRUE'
+    VAR = 'VAR'
+    WHILE = 'WHILE'
+
+
 class Token:
     def __init__(self, type: str, lexeme: str, literal: Optional[object], line: int):
         self.type = type
@@ -46,6 +64,24 @@ class Scanner:
         self.current = 0
         self.line = 1
         self.error_occurred = False
+        self.reserved_words = {
+            "and": TokenType.AND,
+            "class": TokenType.CLASS,
+            "else": TokenType.ELSE,
+            "false": TokenType.FALSE,
+            "for": TokenType.FOR,
+            "fun": TokenType.FUN,
+            "if": TokenType.IF,
+            "nil": TokenType.NIL,
+            "or": TokenType.OR,
+            "print": TokenType.PRINT,
+            "return": TokenType.RETURN,
+            "super": TokenType.SUPER,
+            "this": TokenType.THIS,
+            "true": TokenType.TRUE,
+            "var": TokenType.VAR,
+            "while": TokenType.WHILE,
+        }
         self.token_actions: Dict[str, Callable[[], None]] = {
             "(": lambda: self.add_token(TokenType.LEFT_PAREN),
             ")": lambda: self.add_token(TokenType.RIGHT_PAREN),
@@ -86,7 +122,7 @@ class Scanner:
 
         if char in self.token_actions:
             self.token_actions[char]()
-        elif char.isalpha() or char == "_":
+        elif char.isalpha():
             self.identifier()
         elif char.isdigit():
             self.number()
@@ -97,6 +133,15 @@ class Scanner:
             # Report unexpected characters
             Lox.error(self.line, f"Unexpected character: {char}")
             self.error_occurred = True
+
+
+    def identifier(self) -> None:
+        while self.peek().isalnum() or self.peek() == "_":
+            self.advance()
+        text = self.source[self.start:self.current]
+        token_type = self.reserved_words.get(text, TokenType.IDENTIFIER)
+        self.add_token(token_type, text)
+
 
     def handle_dot(self) -> None:
         if self.peek().isdigit():
