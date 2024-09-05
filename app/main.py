@@ -43,6 +43,7 @@ class Scanner:
         self.start = 0
         self.current = 0
         self.line = 1
+        self.error_occurred = False
         self.token_actions: Dict[str, Callable[[], None]] = {
             "(": lambda: self.add_token(TokenType.LEFT_PAREN),
             ")": lambda: self.add_token(TokenType.RIGHT_PAREN),
@@ -107,6 +108,7 @@ class Scanner:
             self.advance()
         if self.is_at_end():
             Lox.error(self.line, "Unterminated string.")
+            self.error_occurred = True
             return
         self.advance()
         value = self.source[self.start + 1:self.current - 1]
@@ -158,9 +160,12 @@ def main() -> None:
 
     for token in tokens:
         if token.type == TokenType.EOF:
-            print(f"{token.type}  null")
+            print(f"{token.type} null")
         else:
             print(f"{token.type} {token.lexeme} {token.literal}")
+
+    if scanner.error_occurred:
+        sys.exit(65)
 
 if __name__ == "__main__":
     main()
