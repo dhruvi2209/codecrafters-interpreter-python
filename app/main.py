@@ -140,12 +140,7 @@ class Scanner:
             self.error_occurred = True
 
 
-    def identifier(self) -> None:
-        while self.peek().isalnum() or self.peek() == "_":
-            self.advance()
-        text = self.source[self.start:self.current]
-        token_type = self.reserved_words.get(text, TokenType.IDENTIFIER)
-        self.add_token(token_type, text)
+    
 
 
 
@@ -199,7 +194,9 @@ class Scanner:
         while self.peek().isalnum() or self.peek() == "_":
             self.advance()
         text = self.source[self.start:self.current]
-        self.add_token(TokenType.IDENTIFIER, text)
+        token_type = self.reserved_words.get(text, TokenType.IDENTIFIER)
+        self.add_token(token_type, text)
+
 
     def advance(self) -> str:
         self.current += 1
