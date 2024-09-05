@@ -22,9 +22,12 @@ def main():
 
     line = 1
     has_error = False
+    i = 0
 
     # Scan for tokens
-    for char in file_contents:
+    while i < len(file_contents):
+        char = file_contents[i]
+        
         if char == '(':
             print("LEFT_PAREN ( null")
         elif char == ')':
@@ -45,9 +48,17 @@ def main():
             print("SEMICOLON ; null")
         elif char == '*':
             print("STAR * null")
+        elif char == '=':
+            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
+                print("EQUAL_EQUAL == null")
+                i += 1  # Skip the next character as it's part of "=="
+            else:
+                print("EQUAL = null")
         else:
             report_error(line, f"Unexpected character: {char}")
             has_error = True
+
+        i += 1
 
     # End of file
     print("EOF  null")
