@@ -65,23 +65,24 @@ class Scanner:
         self.line = 1
         self.error_occurred = False
         self.reserved_words = {
-            "and": TokenType.AND,
-            "class": TokenType.CLASS,
-            "else": TokenType.ELSE,
-            "false": TokenType.FALSE,
-            "for": TokenType.FOR,
-            "fun": TokenType.FUN,
-            "if": TokenType.IF,
-            "nil": TokenType.NIL,
-            "or": TokenType.OR,
-            "print": TokenType.PRINT,
-            "return": TokenType.RETURN,
-            "super": TokenType.SUPER,
-            "this": TokenType.THIS,
-            "true": TokenType.TRUE,
-            "var": TokenType.VAR,
-            "while": TokenType.WHILE,
-        }
+    "and": TokenType.AND,
+    "class": TokenType.CLASS,
+    "else": TokenType.ELSE,
+    "false": TokenType.FALSE,
+    "for": TokenType.FOR,
+    "fun": TokenType.FUN,
+    "if": TokenType.IF,
+    "nil": TokenType.NIL,
+    "or": TokenType.OR,
+    "print": TokenType.PRINT,
+    "return": TokenType.RETURN,
+    "super": TokenType.SUPER,
+    "this": TokenType.THIS,
+    "true": TokenType.TRUE,
+    "var": TokenType.VAR,
+    "while": TokenType.WHILE,
+}
+
 
         self.token_actions: Dict[str, Callable[[], None]] = {
             "(": lambda: self.add_token(TokenType.LEFT_PAREN),
@@ -142,8 +143,11 @@ class Scanner:
         while self.peek().isalnum() or self.peek() == "_":
             self.advance()
         text = self.source[self.start:self.current]
+
+        # Check if the identifier is a reserved word
         token_type = self.reserved_words.get(text, TokenType.IDENTIFIER)
         self.add_token(token_type, text)
+
 
     def handle_dot(self) -> None:
         if self.peek().isdigit():
@@ -203,10 +207,11 @@ class Scanner:
 
     def add_token(self, type: str, literal: Optional[object] = None) -> None:
         text = self.source[self.start:self.current]
-        # Ensure that IDENTIFIER tokens have 'null' as the literal value
+        # For IDENTIFIER tokens, the literal should be None
         if type == TokenType.IDENTIFIER:
             literal = None
         self.tokens.append(Token(type, text, literal, self.line))
+
 
     def peek(self) -> str:
         return "\0" if self.is_at_end() else self.source[self.current]
@@ -237,4 +242,5 @@ def main() -> None:
 
     if scanner.error_occurred:
         sys.exit(65)
+
 
