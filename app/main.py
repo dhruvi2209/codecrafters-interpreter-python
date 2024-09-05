@@ -240,14 +240,12 @@ def main() -> None:
     for token in tokens:
         token_type = token.type
         token_lexeme = token.lexeme
-        if token_type == TokenType.IDENTIFIER:
-            print(f'{token_type}("{token_lexeme}")')
-        elif token_type in {TokenType.STRING, TokenType.NUMBER}:
-            print(f'{token_type}({token.literal})')
-        elif token_type == TokenType.EOF:
-            print(f'{token_type}()')
+        if token_type == TokenType.STRING:
+            print(f'{token_type} {token_lexeme} {token.literal}')
+        elif token_type == TokenType.NUMBER:
+            print(f'{token_type} {token_lexeme} {token.literal}')
         else:
-            print(token_type)
+            print(f'{token_type} {token_lexeme} null')
 
 if __name__ == "__main__":
     main()
