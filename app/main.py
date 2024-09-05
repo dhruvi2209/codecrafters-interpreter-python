@@ -4,8 +4,6 @@ def report_error(line, message):
     print(f"[line {line}] Error: {message}", file=sys.stderr)
 
 def main():
-    print("Logs from your program will appear here!", file=sys.stderr)
-
     if len(sys.argv) < 3:
         print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
         exit(1)
