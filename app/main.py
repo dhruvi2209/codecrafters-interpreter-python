@@ -86,10 +86,10 @@ class Scanner:
             else:
                 Lox.error(self.line, f"Unexpected character: {char}")
         self.add_token(TokenType.EOF)
+        self.print_tokens()
         return self.tokens
 
     def handle_string(self) -> None:
-        # Save the initial position to include quotes in lexeme
         self.start += 1  # Skip the initial quote
         while self.peek() != '"' and not self.is_at_end():
             if self.peek() == "\n":
@@ -102,7 +102,6 @@ class Scanner:
         value = self.source[self.start : self.current - 1]
         lexeme = self.source[self.start - 1 : self.current]
         self.add_token(TokenType.STRING, value)
-        print(f"Handling string: {lexeme} -> {value}")  # Debug print
 
     def handle_slash(self) -> None:
         if self.match('/'):
@@ -124,8 +123,11 @@ class Scanner:
     def add_token(self, type: str, literal: Optional[object] = None) -> None:
         text = self.source[self.start : self.current]
         token = Token(type, text, literal, self.line)
-        print(f"Adding token: {token}")  # Debug print
         self.tokens.append(token)
+
+    def print_tokens(self) -> None:
+        for token in self.tokens:
+            print(token)
 
     def peek(self) -> str:
         return "\0" if self.is_at_end() else self.source[self.current]
