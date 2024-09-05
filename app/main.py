@@ -23,6 +23,10 @@ def main():
             print("LEFT_PAREN ( null")
         elif char == ')':
             print("RIGHT_PAREN ) null")
+        elif char == '{':
+            print("LEFT_BRACE { null")
+        elif char == '}':
+            print("RIGHT_BRACE } null")
 
     # End of file
     print("EOF  null")
