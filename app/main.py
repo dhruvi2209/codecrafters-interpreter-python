@@ -1,120 +1,132 @@
+from typing import Callable, Dict, List, Optional
 import sys
 
-def report_error(line, message):
-    print(f"[line {line}] Error: {message}", file=sys.stderr)
+class TokenType:
+    LEFT_PAREN = "LEFT_PAREN"
+    RIGHT_PAREN = "RIGHT_PAREN"
+    LEFT_BRACE = "LEFT_BRACE"
+    RIGHT_BRACE = "RIGHT_BRACE"
+    COMMA = "COMMA"
+    DOT = "DOT"
+    MINUS = "MINUS"
+    PLUS = "PLUS"
+    SEMICOLON = "SEMICOLON"
+    STAR = "STAR"
+    BANG = "BANG"
+    BANG_EQUAL = "BANG_EQUAL"
+    EQUAL = "EQUAL"
+    EQUAL_EQUAL = "EQUAL_EQUAL"
+    LESS = "LESS"
+    LESS_EQUAL = "LESS_EQUAL"
+    GREATER = "GREATER"
+    GREATER_EQUAL = "GREATER_EQUAL"
+    SLASH = "SLASH"
+    STRING = "STRING"
+    EOF = "EOF"
 
-def main():
-    if len(sys.argv) < 3:
-        print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
-        exit(1)
+class Token:
+    def __init__(self, type: str, lexeme: str, literal: Optional[object], line: int):
+        self.type = type
+        self.lexeme = lexeme
+        self.literal = literal
+        self.line = line
 
-    command = sys.argv[1]
-    filename = sys.argv[2]
+class Lox:
+    @staticmethod
+    def error(line: int, message: str):
+        print(f"[line {line}] Error: {message}", file=sys.stderr)
 
-    if command != "tokenize":
-        print(f"Unknown command: {command}", file=sys.stderr)
-        exit(1)
+class Scanner:
+    def __init__(self, source: str):
+        self.source = source
+        self.tokens: List[Token] = []
+        self.start = 0
+        self.current = 0
+        self.line = 1
+        self.token_actions: Dict[str, Callable[[], None]] = {
+            "(": lambda: self.add_token(TokenType.LEFT_PAREN),
+            ")": lambda: self.add_token(TokenType.RIGHT_PAREN),
+            "{": lambda: self.add_token(TokenType.LEFT_BRACE),
+            "}": lambda: self.add_token(TokenType.RIGHT_BRACE),
+            ",": lambda: self.add_token(TokenType.COMMA),
+            ".": lambda: self.add_token(TokenType.DOT),
+            "-": lambda: self.add_token(TokenType.MINUS),
+            "+": self.handle_plus,
+            ";": lambda: self.add_token(TokenType.SEMICOLON),
+            "*": lambda: self.add_token(TokenType.STAR),
+            "!": lambda: self.add_token(
+                TokenType.BANG_EQUAL if self.match("=") else TokenType.BANG
+            ),
+            "=": lambda: self.add_token(
+                TokenType.EQUAL_EQUAL if self.match("=") else TokenType.EQUAL
+            ),
+            "<": lambda: self.add_token(
+                TokenType.LESS_EQUAL if self.match("=") else TokenType.LESS
+            ),
+            ">": lambda: self.add_token(
+                TokenType.GREATER_EQUAL if self.match("=") else TokenType.GREATER
+            ),
+            "/": self.handle_slash,
+            '"': self.handle_string,
+        }
 
-    with open(filename) as file:
-        file_contents = file.read()
+    def scan_tokens(self) -> List[Token]:
+        while not self.is_at_end():
+            self.start = self.current
+            char = self.advance()
+            if char in ' \t':
+                continue
+            elif char == '\n':
+                self.line += 1
+            elif char in self.token_actions:
+                self.token_actions[char]()
+            else:
+                Lox.error(self.line, f"Unexpected character: {char}")
+        self.add_token(TokenType.EOF)
+        return self.tokens
 
-    line = 1
-    has_error = False
-    i = 0
-    while i < len(file_contents):
-        char = file_contents[i]
+    def handle_string(self) -> None:
+        while self.peek() != '"' and not self.is_at_end():
+            if self.peek() == "\n":
+                self.line += 1
+            self.advance()
+        if self.is_at_end():
+            Lox.error(self.line, "Unterminated string.")
+            return
+        self.advance()  # Consume the closing ".
+        value = self.source[self.start + 1 : self.current - 1]
+        self.add_token(TokenType.STRING, value)
 
-        if char in ' \t':  # Skip whitespace (space and tab)
-            i += 1
-            continue
-
-        if char == '\n':  # Handle newlines
-            line += 1
-        elif char == '/':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '/':
-                # Skip to the end of the line for comments
-                i += 1
-                while i < len(file_contents) and file_contents[i] != '\n':
-                    i += 1
-                if i < len(file_contents) and file_contents[i] == '\n':
-                    line += 1
-            else:
-                print("SLASH / null")
-        elif char == '(':
-            print("LEFT_PAREN ( null")
-        elif char == ')':
-            print("RIGHT_PAREN ) null")
-        elif char == '{':
-            print("LEFT_BRACE { null")
-        elif char == '}':
-            print("RIGHT_BRACE } null")
-        elif char == ',':
-            print("COMMA , null")
-        elif char == '.':
-            print("DOT . null")
-        elif char == '-':
-            print("MINUS - null")
-        elif char == '+':
-            # Check if the previous token was a string literal
-            if i > 0 and file_contents[i-1] == '"':
-                # It's part of a string concatenation, not a standalone operator
-                print("PLUS + null")
-            else:
-                print("PLUS + null")
-        elif char == ';':
-            print("SEMICOLON ; null")
-        elif char == '*':
-            print("STAR * null")
-        elif char == '=':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
-                print("EQUAL_EQUAL == null")
-                i += 1
-            else:
-                print("EQUAL = null")
-        elif char == '!':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
-                print("BANG_EQUAL != null")
-                i += 1
-            else:
-                print("BANG ! null")
-        elif char == '<':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
-                print("LESS_EQUAL <= null")
-                i += 1
-            else:
-                print("LESS < null")
-        elif char == '>':
-            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
-                print("GREATER_EQUAL >= null")
-                i += 1
-            else:
-                print("GREATER > null")
-        elif char == '"':
-            start = i
-            i += 1
-            while i < len(file_contents) and file_contents[i] != '"':
-                if file_contents[i] == '\n':
-                    line += 1
-                i += 1
-            if i < len(file_contents) and file_contents[i] == '"':
-                lexeme = file_contents[start:i+1]
-                literal = file_contents[start+1:i]
-                print(f"STRING {lexeme} {literal}")
-                i += 1
-            else:
-                report_error(line, "Unterminated string.")
-                has_error = True
+    def handle_plus(self) -> None:
+        # Check for string concatenation or addition
+        if self.peek() in ' \t':
+            self.add_token(TokenType.PLUS)
         else:
-            report_error(line, f"Unexpected character: {char}")
-            has_error = True
+            self.add_token(TokenType.PLUS)
 
-        i += 1
+    def handle_slash(self) -> None:
+        if self.match('/'):
+            while self.peek() != '\n' and not self.is_at_end():
+                self.advance()
+        else:
+            self.add_token(TokenType.SLASH)
 
-    # End of file
-    print("EOF  null")
+    def advance(self) -> str:
+        self.current += 1
+        return self.source[self.current - 1]
 
-    if has_error:
-        exit(65)
+    def match(self, expected: str) -> bool:
+        if self.is_at_end() or self.source[self.current] != expected:
+            return False
+        self.current += 1
+        return True
 
-if __name__ == "__main__":
-    main()
+    def add_token(self, type: str, literal: Optional[object] = None) -> None:
+        text = self.source[self.start : self.current]
+        self.tokens.append(Token(type, text, literal, self.line))
+
+    def peek(self) -> str:
+        return "\0" if self.is_at_end() else self.source[self.current]
+
+    def is_at_end(self) -> bool:
+        return self.current >= len(self.source)
