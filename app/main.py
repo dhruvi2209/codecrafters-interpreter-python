@@ -105,8 +105,16 @@ def main():
                 report_error(line, "Unterminated string.")
                 has_error = True
         else:
-            report_error(line, f"Unexpected character: {char}")
-            has_error = True
+            # Check for operators and other tokens that might not have been handled
+            if char.isalpha():
+                start = i
+                while i < length and (file_contents[i].isalpha() or file_contents[i].isdigit()):
+                    i += 1
+                print(f"IDENTIFIER {file_contents[start:i]} null")
+                continue
+            else:
+                report_error(line, f"Unexpected character: {char}")
+                has_error = True
 
         i += 1
 
