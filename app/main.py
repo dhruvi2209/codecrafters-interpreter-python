@@ -54,9 +54,12 @@ class Token:
 
 # Lox class for handling errors
 class Lox:
+    had_error = False
+
     @staticmethod
     def error(line: int, message: str) -> None:
         print(f"[line {line}] Error: {message}", file=sys.stderr)
+        Lox.had_error = True
 
 # Scanner class to tokenize the input source code
 class Scanner:
@@ -182,7 +185,6 @@ class Scanner:
         else:
             self.add_token(TokenType.SLASH)
 
-    # Method to handle string literals
     def handle_string(self) -> None:
         while self.peek() != '"' and not self.is_at_end():
             if self.peek() == '\n':
@@ -191,12 +193,12 @@ class Scanner:
 
         if self.is_at_end():
             Lox.error(self.line, "Unterminated string.")
-            self.error_occurred = True
-            return
+            return  # Stop processing this token, don't add it
 
         self.advance()  # Consume the closing quote
         value = self.source[self.start + 1:self.current - 1]  # Trim the surrounding quotes
         self.add_token(TokenType.STRING, value)
+
 
     # Method to advance to the next character and return the current one
     def advance(self) -> str:
@@ -241,11 +243,15 @@ def main() -> None:
         token_type = token.type
         token_lexeme = token.lexeme
         if token_type == TokenType.STRING:
-            print(f'{token_type} {token_lexeme} {token.literal}')
-        elif token_type == TokenType.NUMBER:
-            print(f'{token_type} {token_lexeme} {token.literal}')
+            literal = token.literal
+            print(f'{token_type} "{token_lexeme}" {literal}')
         else:
             print(f'{token_type} {token_lexeme} null')
 
+    # Check if an error was encountered
+    if Lox.had_error:
+        sys.exit(65)
+
+# Ensure that this code only runs when the script is executed directly
 if __name__ == "__main__":
     main()
