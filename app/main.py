@@ -65,23 +65,24 @@ class Scanner:
         self.line = 1
         self.error_occurred = False
         self.reserved_words = {
-            "and": TokenType.AND,
-            "class": TokenType.CLASS,
-            "else": TokenType.ELSE,
-            "false": TokenType.FALSE,
-            "for": TokenType.FOR,
-            "fun": TokenType.FUN,
-            "if": TokenType.IF,
-            "nil": TokenType.NIL,
-            "or": TokenType.OR,
-            "print": TokenType.PRINT,
-            "return": TokenType.RETURN,
-            "super": TokenType.SUPER,
-            "this": TokenType.THIS,
-            "true": TokenType.TRUE,
-            "var": TokenType.VAR,
-            "while": TokenType.WHILE,
-        }
+    "and": TokenType.AND,
+    "class": TokenType.CLASS,
+    "else": TokenType.ELSE,
+    "false": TokenType.FALSE,
+    "for": TokenType.FOR,
+    "fun": TokenType.FUN,
+    "if": TokenType.IF,
+    "nil": TokenType.NIL,
+    "or": TokenType.OR,
+    "print": TokenType.PRINT,
+    "return": TokenType.RETURN,
+    "super": TokenType.SUPER,
+    "this": TokenType.THIS,
+    "true": TokenType.TRUE,
+    "var": TokenType.VAR,
+    "while": TokenType.WHILE,
+}
+
         self.token_actions: Dict[str, Callable[[], None]] = {
             "(": lambda: self.add_token(TokenType.LEFT_PAREN),
             ")": lambda: self.add_token(TokenType.RIGHT_PAREN),
@@ -115,7 +116,11 @@ class Scanner:
             self.scan_token()
 
         self.tokens.append(Token(TokenType.EOF, "", None, self.line))
+        # Debugging print
+        for token in self.tokens:
+            print(f"Token type: {token.type}, lexeme: {token.lexeme}")
         return self.tokens
+
 
     def scan_token(self) -> None:
         char = self.advance()
@@ -141,6 +146,7 @@ class Scanner:
         text = self.source[self.start:self.current]
         token_type = self.reserved_words.get(text, TokenType.IDENTIFIER)
         self.add_token(token_type, text)
+
 
 
     def handle_dot(self) -> None:
