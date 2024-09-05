@@ -23,12 +23,21 @@ def main():
     line = 1
     has_error = False
     i = 0
-
-    # Scan for tokens
     while i < len(file_contents):
         char = file_contents[i]
-        
-        if char == '(':
+
+        if char == '/':
+            if i + 1 < len(file_contents) and file_contents[i + 1] == '/':
+                # Skip to the end of the line for comments
+                i += 1
+                while i < len(file_contents) and file_contents[i] != '\n':
+                    i += 1
+                # Continue to the next line after the comment
+                if i < len(file_contents) and file_contents[i] == '\n':
+                    line += 1
+            else:
+                print("SLASH / null")
+        elif char == '(':
             print("LEFT_PAREN ( null")
         elif char == ')':
             print("RIGHT_PAREN ) null")
@@ -51,25 +60,25 @@ def main():
         elif char == '=':
             if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
                 print("EQUAL_EQUAL == null")
-                i += 1  # Skip the next character as it's part of "=="
+                i += 1
             else:
                 print("EQUAL = null")
         elif char == '!':
             if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
                 print("BANG_EQUAL != null")
-                i += 1  # Skip the next character as it's part of "!="
+                i += 1
             else:
                 print("BANG ! null")
         elif char == '<':
             if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
                 print("LESS_EQUAL <= null")
-                i += 1  # Skip the next character as it's part of "<="
+                i += 1
             else:
                 print("LESS < null")
         elif char == '>':
             if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
                 print("GREATER_EQUAL >= null")
-                i += 1  # Skip the next character as it's part of ">="
+                i += 1
             else:
                 print("GREATER > null")
         else:
@@ -81,7 +90,6 @@ def main():
     # End of file
     print("EOF  null")
 
-    # Exit with code 65 if there were errors
     if has_error:
         exit(65)
 
