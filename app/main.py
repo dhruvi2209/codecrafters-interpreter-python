@@ -31,6 +31,9 @@ class Token:
         self.literal = literal
         self.line = line
 
+    def __repr__(self):
+        return f"{self.type} {self.lexeme} {self.literal}"
+
 class Lox:
     @staticmethod
     def error(line: int, message: str):
@@ -51,7 +54,7 @@ class Scanner:
             ",": lambda: self.add_token(TokenType.COMMA),
             ".": lambda: self.add_token(TokenType.DOT),
             "-": lambda: self.add_token(TokenType.MINUS),
-            "+": self.handle_plus,
+            "+": lambda: self.add_token(TokenType.PLUS),
             ";": lambda: self.add_token(TokenType.SEMICOLON),
             "*": lambda: self.add_token(TokenType.STAR),
             "!": lambda: self.add_token(
@@ -86,7 +89,8 @@ class Scanner:
         return self.tokens
 
     def handle_string(self) -> None:
-        print(f"Handling string from position {self.start} to {self.current}")  # Debug print
+        # Save the initial position to include quotes in lexeme
+        self.start += 1  # Skip the initial quote
         while self.peek() != '"' and not self.is_at_end():
             if self.peek() == "\n":
                 self.line += 1
@@ -94,13 +98,11 @@ class Scanner:
         if self.is_at_end():
             Lox.error(self.line, "Unterminated string.")
             return
-        self.advance()  # Consume the closing ".
-        value = self.source[self.start + 1 : self.current - 1]
-        print(f"String value: {value}")  # Debug print
+        self.advance()  # Consume the closing quote
+        value = self.source[self.start : self.current - 1]
+        lexeme = self.source[self.start - 1 : self.current]
         self.add_token(TokenType.STRING, value)
-
-    def handle_plus(self) -> None:
-        self.add_token(TokenType.PLUS)
+        print(f"Handling string: {lexeme} -> {value}")  # Debug print
 
     def handle_slash(self) -> None:
         if self.match('/'):
@@ -121,8 +123,9 @@ class Scanner:
 
     def add_token(self, type: str, literal: Optional[object] = None) -> None:
         text = self.source[self.start : self.current]
-        print(f"Adding token: {type} {literal}")  # Debug print
-        self.tokens.append(Token(type, text, literal, self.line))
+        token = Token(type, text, literal, self.line)
+        print(f"Adding token: {token}")  # Debug print
+        self.tokens.append(token)
 
     def peek(self) -> str:
         return "\0" if self.is_at_end() else self.source[self.current]
