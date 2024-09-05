@@ -54,6 +54,12 @@ def main():
                 i += 1  # Skip the next character as it's part of "=="
             else:
                 print("EQUAL = null")
+        elif char == '!':
+            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
+                print("BANG_EQUAL != null")
+                i += 1  # Skip the next character as it's part of "!="
+            else:
+                print("BANG ! null")
         else:
             report_error(line, f"Unexpected character: {char}")
             has_error = True
