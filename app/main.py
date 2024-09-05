@@ -23,6 +23,7 @@ class TokenType:
     SLASH = 'SLASH'
     STRING = 'STRING'
     NUMBER = 'NUMBER'
+    IDENTIFIER = 'IDENTIFIER'
     EOF = 'EOF'
 
 class Token:
@@ -85,7 +86,7 @@ class Scanner:
 
         if char in self.token_actions:
             self.token_actions[char]()
-        elif char.isalpha():
+        elif char.isalpha() or char == "_":
             self.identifier()
         elif char.isdigit():
             self.number()
@@ -96,7 +97,6 @@ class Scanner:
             # Report unexpected characters
             Lox.error(self.line, f"Unexpected character: {char}")
             self.error_occurred = True
-
 
     def handle_dot(self) -> None:
         if self.peek().isdigit():
@@ -148,7 +148,7 @@ class Scanner:
         while self.peek().isalnum() or self.peek() == "_":
             self.advance()
         text = self.source[self.start:self.current]
-        self.add_token(text.upper(), text)
+        self.add_token(TokenType.IDENTIFIER, text)
 
     def advance(self) -> str:
         self.current += 1
@@ -169,8 +169,6 @@ class Scanner:
 
     def is_at_end(self) -> bool:
         return self.current >= len(self.source)
-
-    
 
 def main() -> None:
     if len(sys.argv) != 3 or sys.argv[1] != 'tokenize':
