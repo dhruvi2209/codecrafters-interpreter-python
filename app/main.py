@@ -93,7 +93,10 @@ class Scanner:
             if char == '\n':
                 self.line += 1
         else:
+            # Report unexpected characters
             Lox.error(self.line, f"Unexpected character: {char}")
+            self.error_occurred = True
+
 
     def handle_dot(self) -> None:
         if self.peek().isdigit():
