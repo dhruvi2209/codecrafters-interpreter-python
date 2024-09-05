@@ -160,9 +160,11 @@ def main() -> None:
 
     for token in tokens:
         if token.type == TokenType.EOF:
-            print(f"{token.type}  null")
+            print(f"{token.type} null")
         else:
-            print(f"{token.type} {token.lexeme} {token.literal}")
+            # Ensure 'null' is used for None values
+            literal = 'null' if token.literal is None else token.literal
+            print(f"{token.type} {token.lexeme} {literal}")
 
     if scanner.error_occurred:
         sys.exit(65)
