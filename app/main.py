@@ -60,6 +60,18 @@ def main():
                 i += 1  # Skip the next character as it's part of "!="
             else:
                 print("BANG ! null")
+        elif char == '<':
+            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
+                print("LESS_EQUAL <= null")
+                i += 1  # Skip the next character as it's part of "<="
+            else:
+                print("LESS < null")
+        elif char == '>':
+            if i + 1 < len(file_contents) and file_contents[i + 1] == '=':
+                print("GREATER_EQUAL >= null")
+                i += 1  # Skip the next character as it's part of ">="
+            else:
+                print("GREATER > null")
         else:
             report_error(line, f"Unexpected character: {char}")
             has_error = True
