@@ -22,6 +22,7 @@ class TokenType:
     GREATER_EQUAL = 'GREATER_EQUAL'
     SLASH = 'SLASH'
     STRING = 'STRING'
+    NUMBER = 'NUMBER'
     EOF = 'EOF'
 
 class Token:
