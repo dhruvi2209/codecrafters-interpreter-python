@@ -55,7 +55,12 @@ def main():
         elif char == '-':
             print("MINUS - null")
         elif char == '+':
-            print("PLUS + null")
+            # Check if the previous token was a string literal
+            if i > 0 and file_contents[i-1] == '"':
+                # It's part of a string concatenation, not a standalone operator
+                print("PLUS + null")
+            else:
+                print("PLUS + null")
         elif char == ';':
             print("SEMICOLON ; null")
         elif char == '*':
