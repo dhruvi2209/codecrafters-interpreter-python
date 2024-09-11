@@ -53,7 +53,7 @@ class Evaluator:
     def evaluate_binary(self, expr: Expr.Binary) -> Union[float, str, None]:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
-        
+
         if expr.operator == '+':
             if isinstance(left, str) and isinstance(right, str):
                 return left + right
@@ -78,6 +78,26 @@ class Evaluator:
                 return left / right
             else:
                 raise ValueError(f"Unsupported operand types for /: {type(left)}, {type(right)}")
+        elif expr.operator == '>':
+            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
+                return "true" if left > right else "false"
+            else:
+                raise ValueError(f"Unsupported operand types for >: {type(left)}, {type(right)}")
+        elif expr.operator == '<':
+            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
+                return "true" if left < right else "false"
+            else:
+                raise ValueError(f"Unsupported operand types for <: {type(left)}, {type(right)}")
+        elif expr.operator == '>=':
+            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
+                return "true" if left >= right else "false"
+            else:
+                raise ValueError(f"Unsupported operand types for >=: {type(left)}, {type(right)}")
+        elif expr.operator == '<=':
+            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
+                return "true" if left <= right else "false"
+            else:
+                raise ValueError(f"Unsupported operand types for <=: {type(left)}, {type(right)}")
         elif expr.operator == '==':
             if isinstance(left, (float, int, str)) and isinstance(right, (float, int, str)):
                 return "true" if left == right else "false"
