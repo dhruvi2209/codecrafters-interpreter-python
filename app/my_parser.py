@@ -48,15 +48,9 @@ class Parser:
 
     def number(self) -> str:
         token = self.previous()
-        try:
-            # Convert the token lexeme to a float
-            number = float(token.lexeme)
-            # Format the number to always include one decimal place
-            formatted_number = f"{number:.1f}"
-            return formatted_number
-        except ValueError:
-            # Handle the case where the token is not a valid number
-            raise ValueError(f"Invalid number literal: {token.lexeme}")
+        # Return the token's lexeme as is to preserve the original format
+        return token.lexeme
+
 
 
 
