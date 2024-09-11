@@ -16,7 +16,13 @@ class Evaluator:
             return "false"
         elif expr.value is None:
             return "nil"
-        elif isinstance(expr.value, float) or isinstance(expr.value, str):
+        elif isinstance(expr.value, float):
+            # Print float values without trailing ".0" if they are whole numbers
+            if expr.value.is_integer():
+                return int(expr.value)
+            else:
+                return expr.value
+        elif isinstance(expr.value, str):
             return expr.value
         else:
             raise ValueError(f"Unexpected literal value: {expr.value}")
