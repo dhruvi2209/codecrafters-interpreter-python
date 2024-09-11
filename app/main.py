@@ -5,9 +5,11 @@ from typing import Callable, Dict, List, Optional
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from token_types import Token, TokenType
-from my_parser import Parser
 from evaluator import Evaluator
 from lox import Lox
+from my_parser import Parser
+from my_parser import Expr
+
 
 
 # # Define Token Types

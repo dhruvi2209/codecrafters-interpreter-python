@@ -1,12 +1,11 @@
 import sys
 from typing import List, Union
 from token_types import Token, TokenType
-import re
-from lox import Lox  # Updated import
+from lox import Lox
 
 class Expr:
     class Literal:
-        def __init__(self, value: Union[bool, None]):
+        def __init__(self, value: Union[bool, None, float, str]):
             self.value = value
 
         def __repr__(self):
@@ -17,109 +16,105 @@ class Expr:
             elif self.value is None:
                 return 'nil'
             return str(self.value)
-        
 
+    class Binary:
+        def __init__(self, left, operator: str, right):
+            self.left = left
+            self.operator = operator
+            self.right = right
+
+    class Unary:
+        def __init__(self, operator: str, right):
+            self.operator = operator
+            self.right = right
+
+    class Grouping:
+        def __init__(self, expression):
+            self.expression = expression
+
+
+# Now define the Parser class
 class Parser:
-    def __init__(self, tokens: List[Token]):
+    def __init__(self, tokens):
         self.tokens = tokens
         self.current = 0
 
-    def parse(self) -> str:
+    def parse(self) -> Expr:
         try:
             return self.expression()
         except SystemExit as e:
             if e.code == 65:
-                # Exit with code 65 for syntax errors
                 sys.exit(65)
             else:
                 raise
 
-    def expression(self) -> str:
-        try:
-            return self.assignment()
-        except SystemExit as e:
-            if e.code == 65:
-                sys.exit(65)
-            else:
-                raise
+    def expression(self) -> Expr:
+        return self.assignment()
 
-    def assignment(self) -> str:
+    def assignment(self) -> Expr:
         expr = self.equality()
         if self.match(TokenType.EQUAL):
             value = self.assignment()
-            return f"(= {expr} {value})"
+            return Expr.Binary(expr, '=', value)
         return expr
 
-    def equality(self) -> str:
+    def equality(self) -> Expr:
         expr = self.comparison()
         while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
             operator = self.previous().lexeme
             right = self.comparison()
-            expr = f"({operator} {expr} {right})"
+            expr = Expr.Binary(expr, operator, right)
         return expr
 
-    def comparison(self) -> str:
+    def comparison(self) -> Expr:
         expr = self.addition()
         while self.match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL):
             operator = self.previous().lexeme
             right = self.addition()
-            expr = f"({operator} {expr} {right})"
+            expr = Expr.Binary(expr, operator, right)
         return expr
 
-    def addition(self) -> str:
+    def addition(self) -> Expr:
         expr = self.multiplication()
         while self.match(TokenType.PLUS, TokenType.MINUS):
             operator = self.previous().lexeme
             right = self.multiplication()
-            expr = f"({operator} {expr} {right})"
+            expr = Expr.Binary(expr, operator, right)
         return expr
 
-    def multiplication(self) -> str:
+    def multiplication(self) -> Expr:
         expr = self.unary()
         while self.match(TokenType.STAR, TokenType.SLASH):
             operator = self.previous().lexeme
             right = self.unary()
-            expr = f"({operator} {expr} {right})"
+            expr = Expr.Binary(expr, operator, right)
         return expr
 
-    def unary(self) -> str:
+    def unary(self) -> Expr:
         if self.match(TokenType.BANG, TokenType.MINUS):
             operator = self.previous().lexeme
             operand = self.unary()
-            return f"({operator} {operand})"
+            return Expr.Unary(operator, operand)
         return self.primary()
 
-    def primary(self) -> str:
+    def primary(self) -> Expr:
         if self.match(TokenType.NUMBER):
-            return self.number()
+            return Expr.Literal(float(self.previous().lexeme))
         elif self.match(TokenType.STRING):
-            return self.string()
-        elif self.match(TokenType.TRUE, TokenType.FALSE):
-            return self.boolean()
+            return Expr.Literal(self.previous().literal)
+        elif self.match(TokenType.TRUE):
+            return Expr.Literal(True)
+        elif self.match(TokenType.FALSE):
+            return Expr.Literal(False)
         elif self.match(TokenType.NIL):
-            return "nil"
+            return Expr.Literal(None)
         elif self.match(TokenType.LEFT_PAREN):
             expr = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return f"(group {expr})"
+            return Expr.Grouping(expr)
         else:
             self.error(self.peek(), "Expect expression.")
-            raise SystemExit(65)  # Exit with code 65 for syntax errors
-
-    def number(self) -> str:
-        token = self.previous()
-        if '.' in token.lexeme:
-            return token.lexeme
-        else:
-            return f"{float(token.lexeme):.1f}"
-
-    def string(self) -> str:
-        token = self.previous()
-        return token.literal
-
-    def boolean(self) -> str:
-        token = self.previous()
-        return token.lexeme
+            raise SystemExit(65)
 
     def match(self, *types: str) -> bool:
         for token_type in types:
@@ -156,13 +151,3 @@ class Parser:
 
     def error(self, token: Token, message: str) -> None:
         Lox.error(token.line, message)
-
-
-#  def number(self) -> str:
-#         token = self.previous()
-#         # Check if the number has a decimal point
-#         if '.' in token.lexeme:
-#             return token.lexeme
-#         else:
-#             # Convert to float and format to ensure decimal point
-#             return f"{float(token.lexeme):.1f}"

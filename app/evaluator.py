@@ -2,6 +2,8 @@
 from typing import Union
 from my_parser import Expr
 from lox import Lox
+from my_parser import Expr
+
 
 class Evaluator:
     def evaluate(self, expr: Expr) -> Union[bool, None]:
