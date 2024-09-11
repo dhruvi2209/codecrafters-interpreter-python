@@ -72,7 +72,7 @@ class Evaluator:
                 return int(result) if result.is_integer() else result
             else:
                 self.runtime_error("Operands must be numbers.")
-
+        
         elif expr.operator == '*':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 result = left * right
@@ -129,5 +129,5 @@ class Evaluator:
             raise ValueError(f"Unexpected binary operator: {expr.operator}")
 
     def runtime_error(self, message: str) -> None:
-        print(f"Operands must be numbers. [{message}]", file=sys.stderr)
+        print(message, file=sys.stderr)
         sys.exit(70)
