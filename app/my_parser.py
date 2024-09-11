@@ -28,41 +28,37 @@ class Parser:
         return self.expression()
 
     def expression(self) -> str:
-        if self.match(TokenType.LEFT_PAREN):
-            content = self.expression()
-            self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return f"(group {content})"  # Ensure proper formatting here
-        elif self.match(TokenType.STRING):
-            return self.string()
-        elif self.match(TokenType.NUMBER):
+        return self.unary()  # Handle unary operators as part of the expression
+
+    def unary(self) -> str:
+        if self.match(TokenType.BANG, TokenType.MINUS):
+            operator = self.previous().lexeme
+            operand = self.unary()  # Recursively parse the operand
+            return f"({operator} {operand})"
+        return self.primary()  # Move to primary expression if no unary operator
+
+    def primary(self) -> str:
+        if self.match(TokenType.TRUE, TokenType.FALSE, TokenType.NIL):
+            return self.boolean() if self.peek().type in [TokenType.TRUE, TokenType.FALSE] else self.nil()
+        if self.match(TokenType.NUMBER):
             return self.number()
-        elif self.match(TokenType.TRUE, TokenType.FALSE):
-            return self.boolean()
-        elif self.match(TokenType.NIL):
-            return "nil"
-        else:
-            Lox.error(self.peek().line, "Unexpected token")
-            return "Unexpected token"
-
-
+        if self.match(TokenType.STRING):
+            return self.string()
+        if self.match(TokenType.LEFT_PAREN):
+            expression = self.expression()
+            self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+            return f"({expression})"
+        self.error("Expect expression.")
+        return "Unexpected token"
 
     def number(self) -> str:
         token = self.previous()
-        # Check if the number has a decimal point
-        if '.' in token.lexeme:
-            return token.lexeme
-        else:
-            # Convert to float and format to ensure decimal point
-            return f"{float(token.lexeme):.1f}"
+        # Ensure the number is formatted correctly
+        return f"{float(token.lexeme)}"  # Convert to float to maintain decimal places
 
-
-
-
-    
     def string(self) -> str:
         token = self.previous()
         return token.literal 
-
 
     def boolean(self) -> str:
         token = self.previous()
@@ -102,3 +98,16 @@ class Parser:
 
     def previous(self) -> Token:
         return self.tokens[self.current - 1]
+
+    def error(self, line: int, message: str) -> None:
+        Lox.error(line, message)
+
+
+#  def number(self) -> str:
+#         token = self.previous()
+#         # Check if the number has a decimal point
+#         if '.' in token.lexeme:
+#             return token.lexeme
+#         else:
+#             # Convert to float and format to ensure decimal point
+#             return f"{float(token.lexeme):.1f}"
