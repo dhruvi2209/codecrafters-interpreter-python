@@ -30,13 +30,14 @@ class Expr:
             # Format strings to include space before negative signs in operations
             def format_operand(operand):
                 operand_str = str(operand)
-                if operand_str.startswith('-'):
-                    return f'- {operand_str[1:]}'  # Add space after the negative sign
+                if isinstance(operand, Expr.Unary) and operand.operator == '-':
+                    return f"- {operand.right}"  # Add space after the negative sign for unary minus
                 return operand_str
 
             left_str = format_operand(self.left)
             right_str = format_operand(self.right)
             return f"({self.operator} {left_str} {right_str})"
+
 
 
     class Unary:
