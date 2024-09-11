@@ -1,11 +1,13 @@
+import sys
+import os
 from typing import Callable, Dict, List, Optional
-import sys, os
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from token_types import Token, TokenType
 from my_parser import Parser
-from lox import Lox 
+from evaluator import Evaluator
+from lox import Lox
 
 
 # # Define Token Types
@@ -238,8 +240,8 @@ class Scanner:
 
 # Main function to handle command-line input and scanning
 def main() -> None:
-    if len(sys.argv) != 3 or sys.argv[1] not in ['tokenize', 'parse']:
-        print("Usage: ./your_program.sh <tokenize|parse> <filename>", file=sys.stderr)
+    if len(sys.argv) != 3 or sys.argv[1] not in ['tokenize', 'parse', 'evaluate']:
+        print("Usage: ./your_program.sh <tokenize|parse|evaluate> <filename>", file=sys.stderr)
         sys.exit(64)
 
     filename = sys.argv[2]
@@ -258,6 +260,13 @@ def main() -> None:
         parser = Parser(tokens)
         expression = parser.parse()
         print(expression)
+
+    elif sys.argv[1] == 'evaluate':
+        parser = Parser(tokens)
+        expr = parser.parse()
+        evaluator = Evaluator()
+        result = evaluator.evaluate(expr)
+        print(result)
 
     if Lox.had_error:
         sys.exit(65)
