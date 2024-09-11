@@ -27,16 +27,9 @@ class Expr:
             self.right = right
 
         def __str__(self):
-            # Format strings to include parentheses for negative numbers
-            def format_operand(operand):
-                if isinstance(operand, Expr.Unary):
-                    return f"({operand})"  # Enclose the unary expression in parentheses
-                return str(operand)
-
-            left_str = format_operand(self.left)
-            right_str = format_operand(self.right)
-            return f"({self.operator} {left_str} {right_str})"
-
+            left_str = format_expression(self.left)
+            right_str = format_expression(self.right)
+            return f"({left_str} {self.operator} {right_str})"
 
     class Unary:
         def __init__(self, operator: str, right):
@@ -44,19 +37,29 @@ class Expr:
             self.right = right
 
         def __str__(self):
-            # Add parentheses around unary expressions to match expected output
-            return f"({self.operator} {self.right})"
-
+            return f"({self.operator} {format_expression(self.right)})"
 
     class Grouping:
         def __init__(self, expression):
             self.expression = expression
 
         def __str__(self):
-            return f"(group {self.expression})"
+            return f"(group {format_expression(self.expression)})"
 
+def format_expression(expr):
+    if isinstance(expr, Expr.Unary):
+        return f"({expr.operator} {format_expression(expr.right)})"
+    elif isinstance(expr, Expr.Binary):
+        left = format_expression(expr.left)
+        right = format_expression(expr.right)
+        return f"({left} {expr.operator} {right})"
+    elif isinstance(expr, Expr.Literal):
+        return str(expr)
+    elif isinstance(expr, Expr.Grouping):
+        return f"(group {format_expression(expr.expression)})"
+    else:
+        raise ValueError("Unknown expression type.")
 
-# Now define the Parser class
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
