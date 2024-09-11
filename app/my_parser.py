@@ -1,6 +1,5 @@
-# Contents of parser.py, now renamed to my_parser.py
 from typing import List, Union
-from main import Token, TokenType
+from token_types import Token, TokenType
 
 class Expr:
     pass
