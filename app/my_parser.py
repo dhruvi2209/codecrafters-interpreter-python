@@ -28,27 +28,31 @@ class Parser:
         return self.expression()
 
     def expression(self) -> str:
-        return self.addition()
+        return self.comparison()
+
+    def comparison(self) -> str:
+        expr = self.addition()
+        while self.match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL):
+            operator = self.previous().lexeme
+            right = self.addition()
+            expr = f"({operator} {expr} {right})"
+        return expr
 
     def addition(self) -> str:
-        result = self.multiplication()
-
+        expr = self.multiplication()
         while self.match(TokenType.PLUS, TokenType.MINUS):
             operator = self.previous().lexeme
             right = self.multiplication()
-            result = f"({operator} {result} {right})"
-
-        return result
+            expr = f"({operator} {expr} {right})"
+        return expr
 
     def multiplication(self) -> str:
-        result = self.unary()
-
+        expr = self.unary()
         while self.match(TokenType.STAR, TokenType.SLASH):
             operator = self.previous().lexeme
             right = self.unary()
-            result = f"({operator} {result} {right})"
-
-        return result
+            expr = f"({operator} {expr} {right})"
+        return expr
 
     def unary(self) -> str:
         if self.match(TokenType.BANG, TokenType.MINUS):
@@ -58,18 +62,18 @@ class Parser:
         return self.primary()
 
     def primary(self) -> str:
-        if self.match(TokenType.NUMBER):
-            return self.number()
+        if self.match(TokenType.LEFT_PAREN):
+            content = self.expression()
+            self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+            return f"(group {content})"
         elif self.match(TokenType.STRING):
             return self.string()
+        elif self.match(TokenType.NUMBER):
+            return self.number()
         elif self.match(TokenType.TRUE, TokenType.FALSE):
             return self.boolean()
         elif self.match(TokenType.NIL):
             return "nil"
-        elif self.match(TokenType.LEFT_PAREN):
-            content = self.expression()
-            self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return f"(group {content})"
         else:
             Lox.error(self.peek().line, "Unexpected token")
             return "Unexpected token"
