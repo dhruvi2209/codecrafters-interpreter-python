@@ -1,6 +1,6 @@
 from typing import Callable, Dict, List, Optional
 import sys
-from parser import Parser  # Import the parser script
+from my_parser import Parser
 
 # Define Token Types
 class TokenType:

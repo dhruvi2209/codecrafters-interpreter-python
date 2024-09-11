@@ -1,11 +1,10 @@
+# Contents of parser.py, now renamed to my_parser.py
 from typing import List, Union
 from main import Token, TokenType
 
-# Base class for all expressions
 class Expr:
     pass
 
-# Class for handling literal expressions
 class Literal(Expr):
     def __init__(self, value: Union[bool, None]):
         self.value = value
@@ -13,7 +12,6 @@ class Literal(Expr):
     def __repr__(self):
         return str(self.value)
 
-# Parser class for converting tokens into an AST
 class Parser:
     def __init__(self, tokens: List[Token]):
         self.tokens = tokens
