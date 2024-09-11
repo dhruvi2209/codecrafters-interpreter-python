@@ -50,7 +50,7 @@ class Evaluator:
         else:
             raise ValueError(f"Unexpected unary operator: {expr.operator}")
 
-    def evaluate_binary(self, expr: Expr.Binary) -> Union[float, str, None]:
+    def evaluate_binary(self, expr: Expr.Binary) -> Union[int, float, str, None]:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
 
@@ -58,24 +58,28 @@ class Evaluator:
             if isinstance(left, str) and isinstance(right, str):
                 return left + right
             elif isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return left + right
+                result = left + right
+                return int(result) if result.is_integer() else result
             else:
                 raise ValueError(f"Unsupported operand types for +: {type(left)}, {type(right)}")
         elif expr.operator == '-':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return left - right
+                result = left - right
+                return int(result) if result.is_integer() else result
             else:
                 raise ValueError(f"Unsupported operand types for -: {type(left)}, {type(right)}")
         elif expr.operator == '*':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return left * right
+                result = left * right
+                return int(result) if result.is_integer() else result
             else:
                 raise ValueError(f"Unsupported operand types for *: {type(left)}, {type(right)}")
         elif expr.operator == '/':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 if right == 0:
                     raise ValueError("Division by zero is not allowed")
-                return left / right
+                result = left / right
+                return int(result) if result.is_integer() else result
             else:
                 raise ValueError(f"Unsupported operand types for /: {type(left)}, {type(right)}")
         elif expr.operator == '>':
