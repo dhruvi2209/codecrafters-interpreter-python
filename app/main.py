@@ -251,7 +251,7 @@ def main() -> None:
         source_code = f.read()
 
     scanner = Scanner(source_code)
-    tokens = scanner.tokenize()
+    tokens = scanner.scan_tokens()  # Corrected method call
 
     if sys.argv[1] == 'tokenize':
         for token in tokens:
