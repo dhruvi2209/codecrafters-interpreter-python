@@ -27,14 +27,7 @@ class Expr:
             self.right = right
 
         def __str__(self):
-            # Ensure the operator is correctly formatted
-            if self.operator == '!=':
-                return f"(!= {self.left} {self.right})"
-            elif self.operator == '==':
-                return f"(== {self.left} {self.right})"
-            else:
-                return f"({self.left} {self.operator} {self.right})"
-
+            return f"({self.operator} {self.left} {self.right})"
 
     class Unary:
         def __init__(self, operator: str, right):
@@ -50,7 +43,6 @@ class Expr:
 
         def __str__(self):
             return f"(group {self.expression})"
-
 
 
 # Now define the Parser class
