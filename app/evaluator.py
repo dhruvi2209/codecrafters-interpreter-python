@@ -53,7 +53,7 @@ class Evaluator:
             # Exiting with code 70 for unknown operators
             sys.exit(70)
 
-    def evaluate_binary(self, expr: Expr.Binary) -> Union[int, float, str, None]:
+    def evaluate_binary(self, expr: Expr.Binary) -> Union[float, str, None]:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
 
@@ -127,6 +127,7 @@ class Evaluator:
         
         else:
             raise ValueError(f"Unexpected binary operator: {expr.operator}")
+
 
     def runtime_error(self, message: str) -> None:
         print(message, file=sys.stderr)
