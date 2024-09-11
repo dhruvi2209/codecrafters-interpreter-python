@@ -27,7 +27,10 @@ class Expr:
             self.right = right
 
         def __str__(self):
-            return f"({self.operator} {self.left} {self.right})"
+            # Ensure space around operators and correct formatting of negative numbers
+            left_str = str(self.left).replace("- ", "-")
+            right_str = str(self.right).replace("- ", "-")
+            return f"({self.operator} {left_str} {right_str})"
 
     class Unary:
         def __init__(self, operator: str, right):
