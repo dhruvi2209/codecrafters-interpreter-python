@@ -33,6 +33,7 @@ class Evaluator:
 
     def evaluate_unary(self, expr: Expr.Unary) -> Union[float, str, None]:
         right = self.evaluate(expr.right)
+        
         if expr.operator == '!':
             if right == "true":
                 return "false"
@@ -42,11 +43,13 @@ class Evaluator:
                 return "false"  # Non-zero numbers are truthy, so !number is false
             else:
                 raise ValueError(f"Unary '!' is not supported for: {right}")
+        
         elif expr.operator == '-':
             if isinstance(right, (float, int)):
                 return -right
             else:
-                raise ValueError(f"Unary '-' is not supported for: {right}")
+                raise RuntimeError("Operand must be a number.")  # Adjusted to RuntimeError
+
         else:
             raise ValueError(f"Unexpected unary operator: {expr.operator}")
 
