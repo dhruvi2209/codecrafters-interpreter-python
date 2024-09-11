@@ -46,7 +46,7 @@ class Evaluator:
             if isinstance(right, (float, int)):
                 return -right
             else:
-                raise RuntimeError("Operand must be a number.")
+                raise RuntimeError("Unary '-' is not supported for non-numeric values.")
         else:
             raise RuntimeError(f"Unknown operator: {expr.operator}")
 
