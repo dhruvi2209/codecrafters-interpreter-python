@@ -41,7 +41,7 @@ class Evaluator:
             elif isinstance(right, (float, int)):
                 return "false"  # Non-zero numbers are truthy, so !number is false
             else:
-                raise RuntimeError(f"Unary '!' is not supported for: {right}")
+                raise RuntimeError("Unary '!' is not supported for non-bool values.")
         elif expr.operator == '-':
             if isinstance(right, (float, int)):
                 return -right
@@ -49,6 +49,7 @@ class Evaluator:
                 raise RuntimeError("Operand must be a number.")
         else:
             raise RuntimeError(f"Unknown operator: {expr.operator}")
+
 
                
     def evaluate_binary(self, expr: Expr.Binary) -> Union[int, float, str, None]:

@@ -251,7 +251,7 @@ def main() -> None:
         source_code = f.read()
 
     scanner = Scanner(source_code)
-    tokens = scanner.scan_tokens()  # Corrected method call
+    tokens = scanner.scan_tokens()
 
     if sys.argv[1] == 'tokenize':
         for token in tokens:
@@ -269,9 +269,10 @@ def main() -> None:
         evaluator = Evaluator()
         try:
             result = evaluator.evaluate(expr)
-            print(result)
+            if result is not None:
+                print(result)
         except RuntimeError as e:
-            print(f"{e}")
+            print(e)
             sys.exit(70)  # Exit code for runtime errors
 
     if Lox.had_error:
