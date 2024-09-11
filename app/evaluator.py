@@ -14,7 +14,6 @@ class Evaluator:
         else:
             raise ValueError(f"Unexpected expression type: {type(expr)}")
 
-
     def evaluate_literal(self, expr: Expr.Literal) -> Union[float, str, None]:
         if expr.value is True:
             return "true"
@@ -51,10 +50,10 @@ class Evaluator:
         else:
             raise ValueError(f"Unexpected unary operator: {expr.operator}")
 
-
     def evaluate_binary(self, expr: Expr.Binary) -> Union[float, str, None]:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
+
         if expr.operator == '+':
             return left + right
         elif expr.operator == '-':
@@ -62,6 +61,8 @@ class Evaluator:
         elif expr.operator == '*':
             return left * right
         elif expr.operator == '/':
+            if right == 0:
+                raise ValueError("Division by zero is not allowed")
             return left / right
         elif expr.operator == '==':
             return "true" if left == right else "false"
