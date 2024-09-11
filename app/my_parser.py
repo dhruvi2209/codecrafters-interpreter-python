@@ -51,13 +51,13 @@ class Parser:
         try:
             # Convert the token lexeme to a float
             number = float(token.lexeme)
-            # Return the number formatted with the same precision as the original input
-            # Remove trailing zeros in the decimal part
-            formatted_number = f"{number:.{len(token.lexeme.split('.')[1])}f}" if '.' in token.lexeme else f"{number:.0f}"
+            # Format the number to always include one decimal place
+            formatted_number = f"{number:.1f}"
             return formatted_number
         except ValueError:
             # Handle the case where the token is not a valid number
             raise ValueError(f"Invalid number literal: {token.lexeme}")
+
 
 
     
