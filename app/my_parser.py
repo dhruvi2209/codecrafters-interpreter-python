@@ -9,7 +9,14 @@ class Literal(Expr):
         self.value = value
 
     def __repr__(self):
+        if self.value is True:
+            return 'true'
+        elif self.value is False:
+            return 'false'
+        elif self.value is None:
+            return 'nil'
         return str(self.value)
+
 
 class Parser:
     def __init__(self, tokens: List[Token]):
