@@ -75,32 +75,18 @@ class Evaluator:
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 if right == 0:
                     raise ValueError("Division by zero is not allowed")
-                result = left / right
-                # Convert result to int if it's a whole number
-                if result.is_integer():
-                    return int(result)
-                return result
+                return left / right
             else:
                 raise ValueError(f"Unsupported operand types for /: {type(left)}, {type(right)}")
-        elif expr.operator == '>':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return "true" if left > right else "false"
+        elif expr.operator == '==':
+            if isinstance(left, (float, int, str)) and isinstance(right, (float, int, str)):
+                return "true" if left == right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for >: {type(left)}, {type(right)}")
-        elif expr.operator == '<':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return "true" if left < right else "false"
+                raise ValueError(f"Unsupported operand types for ==: {type(left)}, {type(right)}")
+        elif expr.operator == '!=':
+            if isinstance(left, (float, int, str)) and isinstance(right, (float, int, str)):
+                return "true" if left != right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for <: {type(left)}, {type(right)}")
-        elif expr.operator == '>=':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return "true" if left >= right else "false"
-            else:
-                raise ValueError(f"Unsupported operand types for >=: {type(left)}, {type(right)}")
-        elif expr.operator == '<=':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return "true" if left <= right else "false"
-            else:
-                raise ValueError(f"Unsupported operand types for <=: {type(left)}, {type(right)}")
+                raise ValueError(f"Unsupported operand types for !=: {type(left)}, {type(right)}")
         else:
             raise ValueError(f"Unexpected binary operator: {expr.operator}")
