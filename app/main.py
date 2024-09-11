@@ -275,6 +275,7 @@ def main() -> None:
             print(e)
             sys.exit(70)  # Exit code for runtime errors
 
+
     if Lox.had_error:
         sys.exit(65)
 

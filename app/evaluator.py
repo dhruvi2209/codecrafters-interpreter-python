@@ -41,15 +41,16 @@ class Evaluator:
             elif isinstance(right, (float, int)):
                 return "false"  # Non-zero numbers are truthy, so !number is false
             else:
-                return ""  # Adjust to match expected output: empty string for unsupported types
+                raise RuntimeError(f"Unsupported type for unary operator '!': {type(right).__name__}")
+
         elif expr.operator == '-':
             if isinstance(right, (float, int)):
                 return -right
             else:
-                return ""  # Adjust to match expected output: empty string for unsupported types
+                raise RuntimeError(f"Unary '-' is not supported for non-numeric values: {type(right).__name__}")
+
         else:
             raise RuntimeError(f"Unknown operator: {expr.operator}")
-
 
 
                
