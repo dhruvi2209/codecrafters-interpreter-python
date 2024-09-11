@@ -1,5 +1,6 @@
 from typing import Callable, Dict, List, Optional
 import sys
+from parser import Parser  # Import the parser script
 
 # Define Token Types
 class TokenType:
@@ -231,8 +232,8 @@ class Scanner:
 
 # Main function to handle command-line input and scanning
 def main() -> None:
-    if len(sys.argv) != 3 or sys.argv[1] != 'tokenize':
-        print("Usage: ./your_program.sh tokenize <filename>", file=sys.stderr)
+    if len(sys.argv) != 3 or sys.argv[1] not in ['tokenize', 'parse']:
+        print("Usage: ./your_program.sh <tokenize|parse> <filename>", file=sys.stderr)
         sys.exit(64)
 
     filename = sys.argv[2]
@@ -242,14 +243,15 @@ def main() -> None:
     scanner = Scanner(source_code)
     tokens = scanner.scan_tokens()
 
-    # Print tokens in the format expected by the tester
-    for token in tokens:
-        if token.type == TokenType.STRING:
-            # Correctly format the lexeme with a single set of double quotes
-            print(f'{token.type} {token.lexeme} {token.literal}')
-        else:
+    if sys.argv[1] == 'tokenize':
+        for token in tokens:
             literal = 'null' if token.literal is None else token.literal
             print(f'{token.type} {token.lexeme} {literal}')
+
+    elif sys.argv[1] == 'parse':
+        parser = Parser(tokens)
+        expression = parser.parse()
+        print(expression)
 
     if Lox.had_error:
         sys.exit(65)
