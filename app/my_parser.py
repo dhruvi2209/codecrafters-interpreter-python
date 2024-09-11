@@ -1,17 +1,18 @@
-from typing import List, Union, Optional
+from typing import List, Union
 from token_types import Token, TokenType
 import re
+
+# Import Lox from main.py
+from main import Lox
 
 class Expr:
     pass
 
 class Literal(Expr):
-    def __init__(self, value: Union[bool, None, str]):
+    def __init__(self, value: Union[bool, None]):
         self.value = value
 
     def __repr__(self):
-        if isinstance(self.value, str):
-            return f'"{self.value}"'
         if self.value is True:
             return 'true'
         elif self.value is False:
@@ -19,6 +20,7 @@ class Literal(Expr):
         elif self.value is None:
             return 'nil'
         return str(self.value)
+
 
 class Parser:
     def __init__(self, tokens: List[Token]):
@@ -30,15 +32,16 @@ class Parser:
         return self.expression()
 
     def expression(self) -> str:
-        # Try parsing different types of literals
-        if self.match(TokenType.NUMBER):
+        if self.match(TokenType.LEFT_PAREN):
+            content = self.expression()  # Parse the content inside the parentheses
+            self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+            return f"(group {content})"
+        elif self.match(TokenType.NUMBER):
             return self.number()
         elif self.match(TokenType.TRUE, TokenType.FALSE):
             return self.boolean()
         elif self.match(TokenType.NIL):
             return self.nil()
-        elif self.match(TokenType.STRING):
-            return self.string()
         # Handle other expressions as needed
         else:
             return "Unexpected token"
@@ -60,16 +63,18 @@ class Parser:
     def nil(self) -> str:
         return "nil"
 
-    def string(self) -> str:
-        token = self.previous()
-        return token.literal
-
     def match(self, *types: str) -> bool:
         for token_type in types:
             if self.check(token_type):
                 self.advance()
                 return True
         return False
+
+    def consume(self, token_type: str, message: str) -> None:
+        if self.check(token_type):
+            self.advance()
+        else:
+            Lox.error(self.peek().line, message)
 
     def check(self, token_type: str) -> bool:
         if self.is_at_end():
