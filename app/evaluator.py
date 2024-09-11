@@ -75,7 +75,11 @@ class Evaluator:
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 if right == 0:
                     raise ValueError("Division by zero is not allowed")
-                return left / right
+                result = left / right
+                # Convert result to int if it's a whole number
+                if result.is_integer():
+                    return int(result)
+                return result
             else:
                 raise ValueError(f"Unsupported operand types for /: {type(left)}, {type(right)}")
         elif expr.operator == '>':
