@@ -28,7 +28,7 @@ class Parser:
         return self.expression()
 
     def expression(self) -> str:
-        return self.unary()  # Handle unary operators as part of the expression
+        return self.unary()  # Start with unary operators
 
     def unary(self) -> str:
         if self.match(TokenType.BANG, TokenType.MINUS):
@@ -38,8 +38,10 @@ class Parser:
         return self.primary()  # Move to primary expression if no unary operator
 
     def primary(self) -> str:
-        if self.match(TokenType.TRUE, TokenType.FALSE, TokenType.NIL):
-            return self.boolean() if self.peek().type in [TokenType.TRUE, TokenType.FALSE] else self.nil()
+        if self.match(TokenType.TRUE, TokenType.FALSE):
+            return self.boolean()  # Return correct boolean literal
+        if self.match(TokenType.NIL):
+            return "nil"
         if self.match(TokenType.NUMBER):
             return self.number()
         if self.match(TokenType.STRING):
@@ -62,7 +64,7 @@ class Parser:
 
     def boolean(self) -> str:
         token = self.previous()
-        return token.lexeme
+        return token.lexeme  # Return 'true' or 'false'
 
     def nil(self) -> str:
         return "nil"
