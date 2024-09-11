@@ -28,35 +28,56 @@ class Parser:
         return self.expression()
 
     def expression(self) -> str:
-        return self.unary()  # Start with unary operators
+        return self.addition()
+
+    def addition(self) -> str:
+        expr = self.multiplication()
+        while self.match(TokenType.PLUS, TokenType.MINUS):
+            operator = self.previous().lexeme
+            right = self.multiplication()
+            expr = f"({operator} {expr} {right})"
+        return expr
+
+    def multiplication(self) -> str:
+        expr = self.unary()
+        while self.match(TokenType.STAR, TokenType.SLASH):
+            operator = self.previous().lexeme
+            right = self.unary()
+            expr = f"({operator} {expr} {right})"
+        return expr
 
     def unary(self) -> str:
         if self.match(TokenType.BANG, TokenType.MINUS):
             operator = self.previous().lexeme
             operand = self.unary()  # Recursively parse the operand
             return f"({operator} {operand})"
-        return self.primary()  # Move to primary expression if no unary operator
+        return self.primary()
 
     def primary(self) -> str:
-        if self.match(TokenType.TRUE, TokenType.FALSE):
-            return self.boolean()  # Return correct boolean literal
-        if self.match(TokenType.NIL):
-            return "nil"
-        if self.match(TokenType.NUMBER):
-            return self.number()
-        if self.match(TokenType.STRING):
-            return self.string()
         if self.match(TokenType.LEFT_PAREN):
             content = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return f"(group {content})"  # Wrap the content in parentheses
-        self.error("Expect expression.")
-        return "Unexpected token"
+            return f"(group {content})"
+        elif self.match(TokenType.STRING):
+            return self.string()
+        elif self.match(TokenType.NUMBER):
+            return self.number()
+        elif self.match(TokenType.TRUE, TokenType.FALSE):
+            return self.boolean()
+        elif self.match(TokenType.NIL):
+            return "nil"
+        else:
+            Lox.error(self.peek().line, "Unexpected token")
+            return "Unexpected token"
 
     def number(self) -> str:
         token = self.previous()
-        # Ensure the number is formatted correctly
-        return f"{float(token.lexeme)}"  # Convert to float to maintain decimal places
+        # Check if the number has a decimal point
+        if '.' in token.lexeme:
+            return token.lexeme
+        else:
+            # Convert to float and format to ensure decimal point
+            return f"{float(token.lexeme):.1f}"
 
     def string(self) -> str:
         token = self.previous()
@@ -64,7 +85,7 @@ class Parser:
 
     def boolean(self) -> str:
         token = self.previous()
-        return token.lexeme  # Return 'true' or 'false'
+        return token.lexeme
 
     def nil(self) -> str:
         return "nil"
@@ -100,9 +121,6 @@ class Parser:
 
     def previous(self) -> Token:
         return self.tokens[self.current - 1]
-
-    def error(self, line: int, message: str) -> None:
-        Lox.error(line, message)
 
 
 #  def number(self) -> str:
