@@ -27,9 +27,15 @@ class Expr:
             self.right = right
 
         def __str__(self):
-            # Ensure space around operators and correct formatting of negative numbers
-            left_str = str(self.left).replace("- ", "-")  # Maintain space before negative numbers
-            right_str = str(self.right).replace("- ", "-")
+            # Format strings to include space before negative signs in operations
+            def format_operand(operand):
+                operand_str = str(operand)
+                if operand_str.startswith('-'):
+                    return f'- {operand_str[1:]}'  # Add space after the negative sign
+                return operand_str
+
+            left_str = format_operand(self.left)
+            right_str = format_operand(self.right)
             return f"({self.operator} {left_str} {right_str})"
 
     class Unary:
