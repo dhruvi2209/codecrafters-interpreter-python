@@ -64,58 +64,70 @@ class Evaluator:
                 result = left + right
                 return int(result) if result.is_integer() else result
             else:
-                raise ValueError(f"Unsupported operand types for +: {type(left)}, {type(right)}")
+                self.runtime_error("Operands must be two numbers or two strings.")
+        
         elif expr.operator == '-':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 result = left - right
                 return int(result) if result.is_integer() else result
             else:
-                raise ValueError(f"Unsupported operand types for -: {type(left)}, {type(right)}")
+                self.runtime_error("Operands must be numbers.")
+
         elif expr.operator == '*':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 result = left * right
                 return int(result) if result.is_integer() else result
             else:
-                # Exiting with code 70 without printing an error message
-                sys.exit(70)
+                self.runtime_error("Operands must be numbers.")
+        
         elif expr.operator == '/':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 if right == 0:
-                    raise ValueError("Division by zero is not allowed")
+                    self.runtime_error("Division by zero is not allowed.")
                 result = left / right
                 return int(result) if result.is_integer() else result
             else:
-                # Exiting with code 70 without printing an error message
-                sys.exit(70)
+                self.runtime_error("Operands must be numbers.")
+        
         elif expr.operator == '>':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 return "true" if left > right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for >: {type(left)}, {type(right)}")
+                self.runtime_error("Operands must be numbers.")
+        
         elif expr.operator == '<':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 return "true" if left < right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for <: {type(left)}, {type(right)}")
+                self.runtime_error("Operands must be numbers.")
+        
         elif expr.operator == '>=':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 return "true" if left >= right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for >=: {type(left)}, {type(right)}")
+                self.runtime_error("Operands must be numbers.")
+        
         elif expr.operator == '<=':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 return "true" if left <= right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for <=: {type(left)}, {type(right)}")
+                self.runtime_error("Operands must be numbers.")
+        
         elif expr.operator == '==':
             if isinstance(left, (float, int, str)) and isinstance(right, (float, int, str)):
                 return "true" if left == right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for ==: {type(left)}, {type(right)}")
+                self.runtime_error("Operands must be of the same type.")
+        
         elif expr.operator == '!=':
             if isinstance(left, (float, int, str)) and isinstance(right, (float, int, str)):
                 return "true" if left != right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for !=: {type(left)}, {type(right)}")
+                self.runtime_error("Operands must be of the same type.")
+        
         else:
             raise ValueError(f"Unexpected binary operator: {expr.operator}")
+
+    def runtime_error(self, message: str) -> None:
+        print(f"Operands must be numbers. [{message}]", file=sys.stderr)
+        sys.exit(70)
