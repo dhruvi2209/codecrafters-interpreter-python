@@ -1,3 +1,4 @@
+import sys
 from typing import Union
 from my_parser import Expr
 
@@ -38,16 +39,17 @@ class Evaluator:
             elif isinstance(right, (float, int)):
                 return "false"  # Non-zero numbers are truthy
             else:
-                # Handle unexpected cases by returning an empty string or appropriate error message
-                return ""  # or another value consistent with your test expectations
+                # Handle unexpected cases by exiting with code 70
+                sys.exit(70)
         elif expr.operator == '-':
             if isinstance(right, (float, int)):
                 return -right
             else:
                 # Handle unsupported types gracefully
-                return ""  # or another value consistent with your test expectations
+                sys.exit(70)
         else:
-            raise RuntimeError(f"Unknown operator: {expr.operator}")
+            # Handle unknown operators
+            sys.exit(70)
 
     def evaluate_binary(self, expr: Expr.Binary) -> Union[int, float, str, None]:
         left = self.evaluate(expr.left)
