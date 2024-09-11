@@ -53,33 +53,32 @@ class Evaluator:
     def evaluate_binary(self, expr: Expr.Binary) -> Union[float, str, None]:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
-
+        
         if expr.operator == '+':
-            result = left + right
+            # Handle string concatenation
+            if isinstance(left, str) and isinstance(right, str):
+                return left + right
+            # Handle numeric addition if needed
+            elif isinstance(left, (float, int)) and isinstance(right, (float, int)):
+                return left + right
+            else:
+                raise ValueError(f"Unsupported operand types for +: {type(left)}, {type(right)}")
         elif expr.operator == '-':
-            result = left - right
+            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
+                return left - right
+            else:
+                raise ValueError(f"Unsupported operand types for -: {type(left)}, {type(right)}")
         elif expr.operator == '*':
-            result = left * right
+            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
+                return left * right
+            else:
+                raise ValueError(f"Unsupported operand types for *: {type(left)}, {type(right)}")
         elif expr.operator == '/':
-            if right == 0:
-                raise ValueError("Division by zero is not allowed")
-            result = left / right
-        elif expr.operator == '==':
-            return "true" if left == right else "false"
-        elif expr.operator == '!=':
-            return "true" if left != right else "false"
-        elif expr.operator == '<':
-            return "true" if left < right else "false"
-        elif expr.operator == '<=':
-            return "true" if left <= right else "false"
-        elif expr.operator == '>':
-            return "true" if left > right else "false"
-        elif expr.operator == '>=':
-            return "true" if left >= right else "false"
+            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
+                if right == 0:
+                    raise ValueError("Division by zero is not allowed")
+                return left / right
+            else:
+                raise ValueError(f"Unsupported operand types for /: {type(left)}, {type(right)}")
         else:
             raise ValueError(f"Unexpected binary operator: {expr.operator}")
-
-        # Convert to int if the result is a whole number
-        if result.is_integer():
-            return int(result)
-        return result
