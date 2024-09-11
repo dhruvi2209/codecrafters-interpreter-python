@@ -19,7 +19,12 @@ class Evaluator:
             return "false"
         elif expr.value is None:
             return "nil"
-        elif isinstance(expr.value, float) or isinstance(expr.value, str):
+        elif isinstance(expr.value, float):
+            # Convert float to int if it's a whole number
+            if expr.value.is_integer():
+                return int(expr.value)
+            return expr.value
+        elif isinstance(expr.value, str):
             return expr.value
         else:
             raise ValueError(f"Unexpected literal value: {expr.value}")
@@ -30,7 +35,11 @@ class Evaluator:
             return 'false' if right in ('true', '10.40') or right else 'true'
         elif expr.operator == '-':
             if isinstance(right, float):
-                return -right
+                # Convert result to int if it's a whole number
+                result = -right
+                if result.is_integer():
+                    return int(result)
+                return result
             else:
                 raise ValueError(f"Unary negation is not supported for: {right}")
         else:
