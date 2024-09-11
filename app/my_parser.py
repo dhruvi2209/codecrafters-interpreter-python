@@ -31,64 +31,63 @@ class Parser:
         return self.addition()
 
     def addition(self) -> str:
-        expr = self.multiplication()
+        result = self.multiplication()
+
         while self.match(TokenType.PLUS, TokenType.MINUS):
             operator = self.previous().lexeme
             right = self.multiplication()
-            expr = f"({operator} {expr} {right})"
-        return expr
+            result = f"({operator} {result} {right})"
+
+        return result
 
     def multiplication(self) -> str:
-        expr = self.unary()
+        result = self.unary()
+
         while self.match(TokenType.STAR, TokenType.SLASH):
             operator = self.previous().lexeme
             right = self.unary()
-            expr = f"({operator} {expr} {right})"
-        return expr
+            result = f"({operator} {result} {right})"
+
+        return result
 
     def unary(self) -> str:
         if self.match(TokenType.BANG, TokenType.MINUS):
             operator = self.previous().lexeme
-            operand = self.unary()  # Recursively parse the operand
+            operand = self.unary()
             return f"({operator} {operand})"
         return self.primary()
 
     def primary(self) -> str:
-        if self.match(TokenType.LEFT_PAREN):
-            content = self.expression()
-            self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return f"(group {content})"
+        if self.match(TokenType.NUMBER):
+            return self.number()
         elif self.match(TokenType.STRING):
             return self.string()
-        elif self.match(TokenType.NUMBER):
-            return self.number()
         elif self.match(TokenType.TRUE, TokenType.FALSE):
             return self.boolean()
         elif self.match(TokenType.NIL):
             return "nil"
+        elif self.match(TokenType.LEFT_PAREN):
+            content = self.expression()
+            self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+            return f"(group {content})"
         else:
             Lox.error(self.peek().line, "Unexpected token")
             return "Unexpected token"
 
     def number(self) -> str:
         token = self.previous()
-        # Check if the number has a decimal point
         if '.' in token.lexeme:
             return token.lexeme
         else:
-            # Convert to float and format to ensure decimal point
             return f"{float(token.lexeme):.1f}"
 
     def string(self) -> str:
         token = self.previous()
-        return token.literal 
+        return token.literal
 
     def boolean(self) -> str:
         token = self.previous()
         return token.lexeme
-
-    def nil(self) -> str:
-        return "nil"
 
     def match(self, *types: str) -> bool:
         for token_type in types:
