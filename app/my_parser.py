@@ -1,3 +1,4 @@
+import sys
 from typing import List, Union
 from token_types import Token, TokenType
 import re
@@ -25,74 +26,86 @@ class Parser:
         self.current = 0
 
     def parse(self) -> str:
-        return self.expression()
+        try:
+            return self.expression()
+        except SystemExit as e:
+            if e.code == 65:
+                # Exit with code 65 for syntax errors
+                sys.exit(65)
+            else:
+                raise
 
     def expression(self) -> str:
-        return self.equality()  # Start with equality
+        try:
+            return self.assignment()
+        except SystemExit as e:
+            if e.code == 65:
+                sys.exit(65)
+            else:
+                raise
+
+    def assignment(self) -> str:
+        expr = self.equality()
+        if self.match(TokenType.EQUAL):
+            value = self.assignment()
+            return f"(= {expr} {value})"
+        return expr
 
     def equality(self) -> str:
-        expr = self.comparison()  # Parse comparison operators first
-
+        expr = self.comparison()
         while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
             operator = self.previous().lexeme
-            right = self.comparison()  # Parse the right-hand side of the equality
+            right = self.comparison()
             expr = f"({operator} {expr} {right})"
-        
         return expr
 
     def comparison(self) -> str:
-        expr = self.addition()  # Parse addition operators first
-
+        expr = self.addition()
         while self.match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL):
             operator = self.previous().lexeme
-            right = self.addition()  # Parse the right-hand side of the comparison
+            right = self.addition()
             expr = f"({operator} {expr} {right})"
-        
         return expr
 
     def addition(self) -> str:
-        expr = self.multiplication()  # Parse multiplication operators first
-
+        expr = self.multiplication()
         while self.match(TokenType.PLUS, TokenType.MINUS):
             operator = self.previous().lexeme
-            right = self.multiplication()  # Parse the right-hand side of the addition
+            right = self.multiplication()
             expr = f"({operator} {expr} {right})"
-        
         return expr
 
     def multiplication(self) -> str:
-        expr = self.unary()  # Parse unary operators first
-
+        expr = self.unary()
         while self.match(TokenType.STAR, TokenType.SLASH):
             operator = self.previous().lexeme
-            right = self.unary()  # Parse the right-hand side of the multiplication
+            right = self.unary()
             expr = f"({operator} {expr} {right})"
-        
         return expr
 
     def unary(self) -> str:
         if self.match(TokenType.BANG, TokenType.MINUS):
             operator = self.previous().lexeme
-            operand = self.unary()  # Recursively parse the operand
+            operand = self.unary()
             return f"({operator} {operand})"
         return self.primary()
 
     def primary(self) -> str:
-        if self.match(TokenType.LEFT_PAREN):
-            content = self.expression()
-            self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return f"(group {content})"
+        if self.match(TokenType.NUMBER):
+            return self.number()
         elif self.match(TokenType.STRING):
             return self.string()
-        elif self.match(TokenType.NUMBER):
-            return self.number()
         elif self.match(TokenType.TRUE, TokenType.FALSE):
             return self.boolean()
         elif self.match(TokenType.NIL):
             return "nil"
+        elif self.match(TokenType.LEFT_PAREN):
+            expr = self.expression()
+            self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
+            return f"(group {expr})"
         else:
-            Lox.error(self.peek().line, "Unexpected token")
-            return "Unexpected token"
+            self.error(self.peek(), "Expect expression.")
+            raise SystemExit(65)  # Exit with code 65 for syntax errors
 
     def number(self) -> str:
         token = self.previous()
@@ -120,7 +133,8 @@ class Parser:
         if self.check(token_type):
             self.advance()
         else:
-            Lox.error(self.peek().line, message)
+            self.error(self.peek(), message)
+            raise SystemExit(65)  # Exit with code 65 for syntax errors
 
     def check(self, token_type: str) -> bool:
         if self.is_at_end():
@@ -140,6 +154,9 @@ class Parser:
 
     def previous(self) -> Token:
         return self.tokens[self.current - 1]
+
+    def error(self, token: Token, message: str) -> None:
+        Lox.error(token.line, message)
 
 
 #  def number(self) -> str:
