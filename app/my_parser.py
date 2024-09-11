@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Optional
 from token_types import Token, TokenType
 import re
 
@@ -6,10 +6,12 @@ class Expr:
     pass
 
 class Literal(Expr):
-    def __init__(self, value: Union[bool, None]):
+    def __init__(self, value: Union[bool, None, str]):
         self.value = value
 
     def __repr__(self):
+        if isinstance(self.value, str):
+            return f'"{self.value}"'
         if self.value is True:
             return 'true'
         elif self.value is False:
@@ -17,7 +19,6 @@ class Literal(Expr):
         elif self.value is None:
             return 'nil'
         return str(self.value)
-
 
 class Parser:
     def __init__(self, tokens: List[Token]):
@@ -36,6 +37,8 @@ class Parser:
             return self.boolean()
         elif self.match(TokenType.NIL):
             return self.nil()
+        elif self.match(TokenType.STRING):
+            return self.string()
         # Handle other expressions as needed
         else:
             return "Unexpected token"
@@ -56,6 +59,10 @@ class Parser:
 
     def nil(self) -> str:
         return "nil"
+
+    def string(self) -> str:
+        token = self.previous()
+        return token.literal
 
     def match(self, *types: str) -> bool:
         for token_type in types:
