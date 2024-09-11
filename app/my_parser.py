@@ -67,6 +67,19 @@ def format_expression(expr):
         return f"(group {format_expression(expr.expression)})"
     else:
         raise ValueError("Unknown expression type.")
+def evaluate(expr):
+    if isinstance(expr, Expr.Literal):
+        if isinstance(expr.value, float):
+            # Print float values with minimal decimal places
+            if expr.value.is_integer():
+                print(int(expr.value))
+            else:
+                print(expr.value)
+        else:
+            # Print strings and other values directly
+            print(expr.value)
+    else:
+        raise ValueError("Unsupported expression type")
 
 class Parser:
     def __init__(self, tokens):
