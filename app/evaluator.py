@@ -14,6 +14,7 @@ class Evaluator:
         else:
             raise ValueError(f"Unexpected expression type: {type(expr)}")
 
+
     def evaluate_literal(self, expr: Expr.Literal) -> Union[float, str, None]:
         if expr.value is True:
             return "true"
@@ -38,19 +39,18 @@ class Evaluator:
                 return "false"
             elif right == "false" or right == "nil":
                 return "true"
+            elif isinstance(right, (float, int)):
+                return "false"  # Non-zero numbers are truthy, so !number is false
             else:
                 raise ValueError(f"Unary '!' is not supported for: {right}")
         elif expr.operator == '-':
             if isinstance(right, (float, int)):
-                # Convert result to int if it's a whole number
-                result = -right
-                if result.is_integer():
-                    return int(result)
-                return result
+                return -right
             else:
                 raise ValueError(f"Unary '-' is not supported for: {right}")
         else:
             raise ValueError(f"Unexpected unary operator: {expr.operator}")
+
 
     def evaluate_binary(self, expr: Expr.Binary) -> Union[float, str, None]:
         left = self.evaluate(expr.left)
