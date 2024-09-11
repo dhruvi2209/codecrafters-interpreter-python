@@ -23,32 +23,44 @@ class Parser:
         self.tokens = tokens
         self.current = 0
 
-    def parse(self) -> Expr:
+    def parse(self) -> str:
+        # Start parsing from the top-level expression
         return self.expression()
 
-    def expression(self) -> Expr:
-        return self.literal()
-
-    def literal(self) -> Expr:
-        if self.match(TokenType.TRUE):
-            return Literal(True)
-        elif self.match(TokenType.FALSE):
-            return Literal(False)
+    def expression(self) -> str:
+        # Try parsing different types of literals
+        if self.match(TokenType.NUMBER):
+            return self.number()
+        elif self.match(TokenType.TRUE, TokenType.FALSE):
+            return self.boolean()
         elif self.match(TokenType.NIL):
-            return Literal(None)
+            return self.nil()
+        # Handle other expressions as needed
+        else:
+            return "Unexpected token"
 
-        raise Exception("Expected a literal.")
+    def number(self) -> str:
+        token = self.previous()
+        return token.lexeme
 
-    def match(self, type: str) -> bool:
-        if self.check(type):
-            self.advance()
-            return True
+    def boolean(self) -> str:
+        token = self.previous()
+        return token.lexeme
+
+    def nil(self) -> str:
+        return "nil"
+
+    def match(self, *types: str) -> bool:
+        for token_type in types:
+            if self.check(token_type):
+                self.advance()
+                return True
         return False
 
-    def check(self, type: str) -> bool:
+    def check(self, token_type: str) -> bool:
         if self.is_at_end():
             return False
-        return self.peek().type == type
+        return self.peek().type == token_type
 
     def advance(self) -> Token:
         if not self.is_at_end():
