@@ -41,7 +41,9 @@ class Parser:
 
     def number(self) -> str:
         token = self.previous()
-        return token.lexeme
+        # Ensure that all numbers are formatted with a decimal point
+        value = float(token.lexeme)
+        return f"{value:.1f}"
 
     def boolean(self) -> str:
         token = self.previous()
