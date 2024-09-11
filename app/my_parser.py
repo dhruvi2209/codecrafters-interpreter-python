@@ -5,20 +5,19 @@ import re
 from lox import Lox  # Updated import
 
 class Expr:
-    pass
+    class Literal:
+        def __init__(self, value: Union[bool, None]):
+            self.value = value
 
-class Literal(Expr):
-    def __init__(self, value: Union[bool, None]):
-        self.value = value
-
-    def __repr__(self):
-        if self.value is True:
-            return 'true'
-        elif self.value is False:
-            return 'false'
-        elif self.value is None:
-            return 'nil'
-        return str(self.value)
+        def __repr__(self):
+            if self.value is True:
+                return 'true'
+            elif self.value is False:
+                return 'false'
+            elif self.value is None:
+                return 'nil'
+            return str(self.value)
+        
 
 class Parser:
     def __init__(self, tokens: List[Token]):
