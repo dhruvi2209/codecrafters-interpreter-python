@@ -55,7 +55,8 @@ class Expr:
 
 def format_expression(expr):
     if isinstance(expr, Expr.Unary):
-        return f"{expr.operator}{format_expression(expr.right)}"
+        # Ensure parentheses around unary expressions
+        return f"({expr.operator} {format_expression(expr.right)})"
     elif isinstance(expr, Expr.Binary):
         left = format_expression(expr.left)
         right = format_expression(expr.right)
