@@ -1,6 +1,6 @@
-import sys
 from typing import Union
 from my_parser import Expr
+import sys
 
 class Evaluator:
     def evaluate(self, expr: Expr) -> Union[float, str, None]:
@@ -23,7 +23,9 @@ class Evaluator:
         elif expr.value is None:
             return "nil"
         elif isinstance(expr.value, float):
-            return int(expr.value) if expr.value.is_integer() else expr.value
+            if expr.value.is_integer():
+                return int(expr.value)
+            return expr.value
         elif isinstance(expr.value, str):
             return expr.value
         else:
@@ -37,19 +39,16 @@ class Evaluator:
             elif right == "false" or right == "nil":
                 return "true"
             elif isinstance(right, (float, int)):
-                return "false"  # Non-zero numbers are truthy
+                return "false"
             else:
-                # Handle unexpected cases by exiting with code 70
-                sys.exit(70)
+                raise RuntimeError(f"Unary '!' is not supported for non-numeric values: {type(right).__name__}")
         elif expr.operator == '-':
             if isinstance(right, (float, int)):
                 return -right
             else:
-                # Handle unsupported types gracefully
-                sys.exit(70)
+                raise RuntimeError(f"Unary '-' is not supported for non-numeric values: {type(right).__name__}")
         else:
-            # Handle unknown operators
-            sys.exit(70)
+            raise RuntimeError(f"Unknown operator: {expr.operator}")
 
     def evaluate_binary(self, expr: Expr.Binary) -> Union[int, float, str, None]:
         left = self.evaluate(expr.left)
@@ -74,7 +73,9 @@ class Evaluator:
                 result = left * right
                 return int(result) if result.is_integer() else result
             else:
-                raise ValueError(f"Unsupported operand types for *: {type(left)}, {type(right)}")
+                # Raise error for non-numeric operands
+                print("Operands must be numbers.", file=sys.stderr)
+                sys.exit(70)
         elif expr.operator == '/':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 if right == 0:
@@ -82,7 +83,9 @@ class Evaluator:
                 result = left / right
                 return int(result) if result.is_integer() else result
             else:
-                raise ValueError(f"Unsupported operand types for /: {type(left)}, {type(right)}")
+                # Raise error for non-numeric operands
+                print("Operands must be numbers.", file=sys.stderr)
+                sys.exit(70)
         elif expr.operator == '>':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 return "true" if left > right else "false"
