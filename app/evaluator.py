@@ -32,16 +32,21 @@ class Evaluator:
     def evaluate_unary(self, expr: Expr.Unary) -> Union[float, str, None]:
         right = self.evaluate(expr.right)
         if expr.operator == '!':
-            return 'false' if right in ('true', '10.40') or right else 'true'
+            if right == "true":
+                return "false"
+            elif right == "false" or right == "nil":
+                return "true"
+            else:
+                raise ValueError(f"Unary '!' is not supported for: {right}")
         elif expr.operator == '-':
-            if isinstance(right, float):
+            if isinstance(right, (float, int)):
                 # Convert result to int if it's a whole number
                 result = -right
                 if result.is_integer():
                     return int(result)
                 return result
             else:
-                raise ValueError(f"Unary negation is not supported for: {right}")
+                raise ValueError(f"Unary '-' is not supported for: {right}")
         else:
             raise ValueError(f"Unexpected unary operator: {expr.operator}")
 
@@ -57,16 +62,16 @@ class Evaluator:
         elif expr.operator == '/':
             return left / right
         elif expr.operator == '==':
-            return 'true' if left == right else 'false'
+            return "true" if left == right else "false"
         elif expr.operator == '!=':
-            return 'true' if left != right else 'false'
+            return "true" if left != right else "false"
         elif expr.operator == '<':
-            return 'true' if left < right else 'false'
+            return "true" if left < right else "false"
         elif expr.operator == '<=':
-            return 'true' if left <= right else 'false'
+            return "true" if left <= right else "false"
         elif expr.operator == '>':
-            return 'true' if left > right else 'false'
+            return "true" if left > right else "false"
         elif expr.operator == '>=':
-            return 'true' if left >= right else 'false'
+            return "true" if left >= right else "false"
         else:
             raise ValueError(f"Unexpected binary operator: {expr.operator}")
