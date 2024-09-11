@@ -9,6 +9,8 @@ class Evaluator:
             return self.evaluate_unary(expr)
         elif isinstance(expr, Expr.Binary):
             return self.evaluate_binary(expr)
+        elif isinstance(expr, Expr.Grouping):
+            return self.evaluate(expr.expression)  # Evaluate the expression inside the parentheses
         else:
             raise ValueError(f"Unexpected expression type: {type(expr)}")
 
