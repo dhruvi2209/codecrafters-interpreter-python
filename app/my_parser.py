@@ -55,6 +55,11 @@ class Parser:
     def number(self) -> str:
         token = self.previous()
         return token.lexeme
+    
+    def string(self) -> str:
+        token = self.previous()
+        return f'"{token.literal}"'
+
 
     def boolean(self) -> str:
         token = self.previous()
