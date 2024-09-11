@@ -41,14 +41,17 @@ class Evaluator:
             elif isinstance(right, (float, int)):
                 return "false"
             else:
-                raise RuntimeError(f"Unary '!' is not supported for non-numeric values: {type(right).__name__}")
+                # Exiting with code 70 without printing an error message
+                sys.exit(70)
         elif expr.operator == '-':
             if isinstance(right, (float, int)):
                 return -right
             else:
-                raise RuntimeError(f"Unary '-' is not supported for non-numeric values: {type(right).__name__}")
+                # Exiting with code 70 without printing an error message
+                sys.exit(70)
         else:
-            raise RuntimeError(f"Unknown operator: {expr.operator}")
+            # Exiting with code 70 for unknown operators
+            sys.exit(70)
 
     def evaluate_binary(self, expr: Expr.Binary) -> Union[int, float, str, None]:
         left = self.evaluate(expr.left)
@@ -73,8 +76,7 @@ class Evaluator:
                 result = left * right
                 return int(result) if result.is_integer() else result
             else:
-                # Raise error for non-numeric operands
-                print("Operands must be numbers.", file=sys.stderr)
+                # Exiting with code 70 without printing an error message
                 sys.exit(70)
         elif expr.operator == '/':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
@@ -83,8 +85,7 @@ class Evaluator:
                 result = left / right
                 return int(result) if result.is_integer() else result
             else:
-                # Raise error for non-numeric operands
-                print("Operands must be numbers.", file=sys.stderr)
+                # Exiting with code 70 without printing an error message
                 sys.exit(70)
         elif expr.operator == '>':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
