@@ -55,15 +55,15 @@ class Evaluator:
         right = self.evaluate(expr.right)
 
         if expr.operator == '+':
-            return left + right
+            result = left + right
         elif expr.operator == '-':
-            return left - right
+            result = left - right
         elif expr.operator == '*':
-            return left * right
+            result = left * right
         elif expr.operator == '/':
             if right == 0:
                 raise ValueError("Division by zero is not allowed")
-            return left / right
+            result = left / right
         elif expr.operator == '==':
             return "true" if left == right else "false"
         elif expr.operator == '!=':
@@ -78,3 +78,8 @@ class Evaluator:
             return "true" if left >= right else "false"
         else:
             raise ValueError(f"Unexpected binary operator: {expr.operator}")
+
+        # Convert to int if the result is a whole number
+        if result.is_integer():
+            return int(result)
+        return result
