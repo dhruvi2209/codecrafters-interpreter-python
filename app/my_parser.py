@@ -27,17 +27,15 @@ class Expr:
             self.right = right
 
         def __str__(self):
-            # Format strings to include space before negative signs in operations
+            # Format strings to include parentheses for negative numbers
             def format_operand(operand):
-                operand_str = str(operand)
-                if isinstance(operand, Expr.Unary) and operand.operator == '-':
-                    return f"- {operand.right}"  # Add space after the negative sign for unary minus
-                return operand_str
+                if isinstance(operand, Expr.Unary):
+                    return f"({operand})"  # Enclose the unary expression in parentheses
+                return str(operand)
 
             left_str = format_operand(self.left)
             right_str = format_operand(self.right)
             return f"({self.operator} {left_str} {right_str})"
-
 
 
     class Unary:
@@ -46,7 +44,9 @@ class Expr:
             self.right = right
 
         def __str__(self):
-            return f"({self.operator}{self.right})"
+            # Add parentheses around unary expressions to match expected output
+            return f"({self.operator} {self.right})"
+
 
     class Grouping:
         def __init__(self, expression):
