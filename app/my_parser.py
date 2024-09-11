@@ -48,8 +48,12 @@ class Parser:
 
     def number(self) -> str:
         token = self.previous()
-        # Return the token's lexeme as is to preserve the original format
-        return token.lexeme
+        # Check if the number has a decimal point
+        if '.' in token.lexeme:
+            return token.lexeme
+        else:
+            # Convert to float and format to ensure decimal point
+            return f"{float(token.lexeme):.1f}"
 
 
 
