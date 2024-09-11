@@ -17,20 +17,33 @@ class Expr:
                 return 'nil'
             return str(self.value)
 
+        def __str__(self):
+            return self.__repr__()
+
     class Binary:
         def __init__(self, left, operator: str, right):
             self.left = left
             self.operator = operator
             self.right = right
 
+        def __str__(self):
+            return f"({self.left} {self.operator} {self.right})"
+
     class Unary:
         def __init__(self, operator: str, right):
             self.operator = operator
             self.right = right
 
+        def __str__(self):
+            return f"({self.operator}{self.right})"
+
     class Grouping:
         def __init__(self, expression):
             self.expression = expression
+
+        def __str__(self):
+            return f"(group {self.expression})"
+
 
 
 # Now define the Parser class
