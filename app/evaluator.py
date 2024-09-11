@@ -1,6 +1,7 @@
 from typing import Union
 from my_parser import Expr
 
+
 class Evaluator:
     def evaluate(self, expr: Expr) -> Union[float, str, None]:
         if isinstance(expr, Expr.Literal):
@@ -10,7 +11,8 @@ class Evaluator:
         elif isinstance(expr, Expr.Binary):
             return self.evaluate_binary(expr)
         elif isinstance(expr, Expr.Grouping):
-            return self.evaluate(expr.expression)  # Evaluate the expression inside the parentheses
+            # Evaluate the expression inside the parentheses
+            return self.evaluate(expr.expression)
         else:
             raise ValueError(f"Unexpected expression type: {type(expr)}")
 
@@ -41,17 +43,17 @@ class Evaluator:
             elif isinstance(right, (float, int)):
                 return "false"  # Non-zero numbers are truthy, so !number is false
             else:
-                return ""  # Adjust to match expected output: empty string for unsupported types
+                raise RuntimeError(
+                    f"Unary '!' is not supported for non-numeric values: {type(right).__name__}")
         elif expr.operator == '-':
             if isinstance(right, (float, int)):
                 return -right
             else:
-                return ""  # Adjust to match expected output: empty string for unsupported types
+                raise RuntimeError(
+                    f"Unary '-' is not supported for non-numeric values: {type(right).__name__}")
         else:
             raise RuntimeError(f"Unknown operator: {expr.operator}")
 
-
-               
     def evaluate_binary(self, expr: Expr.Binary) -> Union[int, float, str, None]:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
@@ -63,19 +65,22 @@ class Evaluator:
                 result = left + right
                 return int(result) if result.is_integer() else result
             else:
-                raise ValueError(f"Unsupported operand types for +: {type(left)}, {type(right)}")
+                raise ValueError(
+                    f"Unsupported operand types for +: {type(left)}, {type(right)}")
         elif expr.operator == '-':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 result = left - right
                 return int(result) if result.is_integer() else result
             else:
-                raise ValueError(f"Unsupported operand types for -: {type(left)}, {type(right)}")
+                raise ValueError(
+                    f"Unsupported operand types for -: {type(left)}, {type(right)}")
         elif expr.operator == '*':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 result = left * right
                 return int(result) if result.is_integer() else result
             else:
-                raise ValueError(f"Unsupported operand types for *: {type(left)}, {type(right)}")
+                raise ValueError(
+                    f"Unsupported operand types for *: {type(left)}, {type(right)}")
         elif expr.operator == '/':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 if right == 0:
@@ -83,36 +88,43 @@ class Evaluator:
                 result = left / right
                 return int(result) if result.is_integer() else result
             else:
-                raise ValueError(f"Unsupported operand types for /: {type(left)}, {type(right)}")
+                raise ValueError(
+                    f"Unsupported operand types for /: {type(left)}, {type(right)}")
         elif expr.operator == '>':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 return "true" if left > right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for >: {type(left)}, {type(right)}")
+                raise ValueError(f"Unsupported operand types for >: {
+                                 type(left)}, {type(right)}")
         elif expr.operator == '<':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 return "true" if left < right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for <: {type(left)}, {type(right)}")
+                raise ValueError(f"Unsupported operand types for <: {
+                                 type(left)}, {type(right)}")
         elif expr.operator == '>=':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 return "true" if left >= right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for >=: {type(left)}, {type(right)}")
+                raise ValueError(f"Unsupported operand types for >=: {
+                                 type(left)}, {type(right)}")
         elif expr.operator == '<=':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 return "true" if left <= right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for <=: {type(left)}, {type(right)}")
+                raise ValueError(f"Unsupported operand types for <=: {
+                                 type(left)}, {type(right)}")
         elif expr.operator == '==':
             if isinstance(left, (float, int, str)) and isinstance(right, (float, int, str)):
                 return "true" if left == right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for ==: {type(left)}, {type(right)}")
+                raise ValueError(f"Unsupported operand types for ==: {
+                                 type(left)}, {type(right)}")
         elif expr.operator == '!=':
             if isinstance(left, (float, int, str)) and isinstance(right, (float, int, str)):
                 return "true" if left != right else "false"
             else:
-                raise ValueError(f"Unsupported operand types for !=: {type(left)}, {type(right)}")
+                raise ValueError(f"Unsupported operand types for !=: {
+                                 type(left)}, {type(right)}")
         else:
             raise ValueError(f"Unexpected binary operator: {expr.operator}")
