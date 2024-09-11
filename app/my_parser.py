@@ -28,36 +28,52 @@ class Parser:
         return self.expression()
 
     def expression(self) -> str:
-        return self.comparison()
+        return self.equality()  # Start with equality
+
+    def equality(self) -> str:
+        expr = self.comparison()  # Parse comparison operators first
+
+        while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
+            operator = self.previous().lexeme
+            right = self.comparison()  # Parse the right-hand side of the equality
+            expr = f"({operator} {expr} {right})"
+        
+        return expr
 
     def comparison(self) -> str:
-        expr = self.addition()
+        expr = self.addition()  # Parse addition operators first
+
         while self.match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL):
             operator = self.previous().lexeme
-            right = self.addition()
+            right = self.addition()  # Parse the right-hand side of the comparison
             expr = f"({operator} {expr} {right})"
+        
         return expr
 
     def addition(self) -> str:
-        expr = self.multiplication()
+        expr = self.multiplication()  # Parse multiplication operators first
+
         while self.match(TokenType.PLUS, TokenType.MINUS):
             operator = self.previous().lexeme
-            right = self.multiplication()
+            right = self.multiplication()  # Parse the right-hand side of the addition
             expr = f"({operator} {expr} {right})"
+        
         return expr
 
     def multiplication(self) -> str:
-        expr = self.unary()
+        expr = self.unary()  # Parse unary operators first
+
         while self.match(TokenType.STAR, TokenType.SLASH):
             operator = self.previous().lexeme
-            right = self.unary()
+            right = self.unary()  # Parse the right-hand side of the multiplication
             expr = f"({operator} {expr} {right})"
+        
         return expr
 
     def unary(self) -> str:
         if self.match(TokenType.BANG, TokenType.MINUS):
             operator = self.previous().lexeme
-            operand = self.unary()
+            operand = self.unary()  # Recursively parse the operand
             return f"({operator} {operand})"
         return self.primary()
 
