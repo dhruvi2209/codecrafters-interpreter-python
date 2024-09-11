@@ -5,6 +5,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from token_types import Token, TokenType
 from my_parser import Parser
+from lox import Lox 
 
 
 # # Define Token Types
@@ -59,13 +60,13 @@ from my_parser import Parser
 #         self.line = line
 
 # Lox class for handling errors
-class Lox:
-    had_error = False
+# class Lox:
+#     had_error = False
 
-    @staticmethod
-    def error(line: int, message: str) -> None:
-        print(f"[line {line}] Error: {message}", file=sys.stderr)
-        Lox.had_error = True
+#     @staticmethod
+#     def error(line: int, message: str) -> None:
+#         print(f"[line {line}] Error: {message}", file=sys.stderr)
+#         Lox.had_error = True
 
 # Scanner class to tokenize the input source code
 class Scanner:

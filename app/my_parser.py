@@ -1,9 +1,7 @@
 from typing import List, Union
 from token_types import Token, TokenType
 import re
-
-# Import Lox from main.py
-from main import Lox
+from lox import Lox  # Updated import
 
 class Expr:
     pass
@@ -21,19 +19,17 @@ class Literal(Expr):
             return 'nil'
         return str(self.value)
 
-
 class Parser:
     def __init__(self, tokens: List[Token]):
         self.tokens = tokens
         self.current = 0
 
     def parse(self) -> str:
-        # Start parsing from the top-level expression
         return self.expression()
 
     def expression(self) -> str:
         if self.match(TokenType.LEFT_PAREN):
-            content = self.expression()  # Parse the content inside the parentheses
+            content = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return f"(group {content})"
         elif self.match(TokenType.NUMBER):
@@ -42,15 +38,13 @@ class Parser:
             return self.boolean()
         elif self.match(TokenType.NIL):
             return self.nil()
-        # Handle other expressions as needed
         else:
             return "Unexpected token"
 
     def number(self) -> str:
         token = self.previous()
         value = token.lexeme
-        
-        # Use regex to preserve decimal precision
+
         if re.match(r'^\d+$', value):
             return f"{float(value):.1f}"
         else:
