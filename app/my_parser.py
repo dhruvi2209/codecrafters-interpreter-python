@@ -1,5 +1,6 @@
 from typing import List, Union
 from token_types import Token, TokenType
+import re
 
 class Expr:
     pass
@@ -41,9 +42,13 @@ class Parser:
 
     def number(self) -> str:
         token = self.previous()
-        # Ensure that all numbers are formatted with a decimal point
-        value = float(token.lexeme)
-        return f"{value:.1f}"
+        value = token.lexeme
+        
+        # Use regex to preserve decimal precision
+        if re.match(r'^\d+$', value):
+            return f"{float(value):.1f}"
+        else:
+            return value
 
     def boolean(self) -> str:
         token = self.previous()
