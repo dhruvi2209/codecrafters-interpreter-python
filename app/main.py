@@ -1,5 +1,7 @@
 from typing import Callable, Dict, List, Optional
-import sys
+import sys,os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from my_parser import Parser
 
 # Define Token Types
