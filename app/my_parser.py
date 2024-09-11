@@ -28,20 +28,29 @@ class Parser:
         return self.expression()
 
     def expression(self) -> str:
-        print(f"Parsing expression: {self.peek().type}")  # Debug print
+        print(f"Current token: {self.peek().type}")  # Debug print
         if self.match(TokenType.LEFT_PAREN):
+            print(f"Matched LEFT_PAREN")  # Debug print
             content = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return f"(group {content})"
+        elif self.match(TokenType.STRING):
+            print(f"Matched STRING")  # Debug print
+            return self.string()
         elif self.match(TokenType.NUMBER):
+            print(f"Matched NUMBER")  # Debug print
             return self.number()
         elif self.match(TokenType.TRUE, TokenType.FALSE):
+            print(f"Matched BOOLEAN")  # Debug print
             return self.boolean()
         elif self.match(TokenType.NIL):
-            return self.nil()
+            print(f"Matched NIL")  # Debug print
+            return "nil"
         else:
+            print(f"Unexpected token: {self.peek().type}")  # Debug print
             Lox.error(self.peek().line, "Unexpected token")
             return "Unexpected token"
+
 
     def number(self) -> str:
         token = self.previous()
