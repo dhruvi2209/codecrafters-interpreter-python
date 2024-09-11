@@ -28,7 +28,7 @@ class Expr:
 
         def __str__(self):
             # Ensure space around operators and correct formatting of negative numbers
-            left_str = str(self.left).replace("- ", "-")
+            left_str = str(self.left).replace("- ", "-")  # Maintain space before negative numbers
             right_str = str(self.right).replace("- ", "-")
             return f"({self.operator} {left_str} {right_str})"
 
