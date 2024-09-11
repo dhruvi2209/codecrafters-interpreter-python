@@ -55,29 +55,31 @@ class Evaluator:
         right = self.evaluate(expr.right)
         
         if expr.operator == '+':
-            # Handle string concatenation
             if isinstance(left, str) and isinstance(right, str):
                 return left + right
-            # Handle numeric addition if needed
             elif isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return left + right
+                result = left + right
+                return int(result) if result.is_integer() else result
             else:
                 raise ValueError(f"Unsupported operand types for +: {type(left)}, {type(right)}")
         elif expr.operator == '-':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return left - right
+                result = left - right
+                return int(result) if result.is_integer() else result
             else:
                 raise ValueError(f"Unsupported operand types for -: {type(left)}, {type(right)}")
         elif expr.operator == '*':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return left * right
+                result = left * right
+                return int(result) if result.is_integer() else result
             else:
                 raise ValueError(f"Unsupported operand types for *: {type(left)}, {type(right)}")
         elif expr.operator == '/':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 if right == 0:
                     raise ValueError("Division by zero is not allowed")
-                return left / right
+                result = left / right
+                return int(result) if result.is_integer() else result
             else:
                 raise ValueError(f"Unsupported operand types for /: {type(left)}, {type(right)}")
         else:
