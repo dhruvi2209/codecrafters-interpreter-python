@@ -47,9 +47,9 @@ class Parser:
         if self.match(TokenType.STRING):
             return self.string()
         if self.match(TokenType.LEFT_PAREN):
-            expression = self.expression()
+            content = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
-            return f"({expression})"
+            return f"(group {content})"  # Wrap the content in parentheses
         self.error("Expect expression.")
         return "Unexpected token"
 
