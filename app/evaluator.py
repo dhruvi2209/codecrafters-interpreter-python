@@ -5,30 +5,7 @@ from decimal import Decimal
 from my_parser import Expr
 import sys
 
-class TypeChecker:
-    def check_binary_operands(self, operator: Token, left, right) -> None:
-        if operator.type == TokenType.PLUS:
-            if not ((isinstance(left, str) and isinstance(right, str)) or
-                    (isinstance(left, Decimal) and isinstance(right, Decimal))):
-                raise RuntimeError(operator, "Operands must be two numbers or two strings.")
-        elif operator.type in {
-            TokenType.MINUS, TokenType.STAR, TokenType.SLASH
-        }:
-            if not (isinstance(left, Decimal) and isinstance(right, Decimal)):
-                raise RuntimeError(operator, "Operands must be numbers.")
-        elif operator.type in {
-            TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, 
-            TokenType.LESS_EQUAL, TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL
-        }:
-            if not (isinstance(left, Decimal) and isinstance(right, Decimal)):
-                raise RuntimeError(operator, "Operands must be numbers.")
-        else:
-            raise RuntimeError(operator, f"Unexpected operator: {operator.type}")
-
 class Evaluator:
-    def __init__(self):
-        self.type_checker = TypeChecker()
-
     def evaluate(self, expr: Expr) -> Union[Decimal, str, None]:
         try:
             if isinstance(expr, Expr.Literal):
@@ -43,7 +20,7 @@ class Evaluator:
                 raise ValueError(f"Unexpected expression type: {type(expr)}")
         except RuntimeError as e:
             self.runtime_error(e)
-            return None
+            sys.exit(70)  # Ensure we exit with code 70 for runtime errors
 
     def evaluate_literal(self, expr: Expr.Literal) -> Union[Decimal, str, None]:
         if expr.value is True:
@@ -64,8 +41,9 @@ class Evaluator:
         if expr.operator.type == TokenType.BANG:
             return "false" if right in ["true", "nil"] else "true"
         elif expr.operator.type == TokenType.MINUS:
-            self.type_checker.check_number_operand(expr.operator, right)
-            return -right
+            if not isinstance(right, (Decimal, int)):
+                raise RuntimeError(expr.operator, "Operand must be a number.")
+            return -Decimal(right)
         else:
             raise RuntimeError(expr.operator, f"Unknown unary operator: {expr.operator}")
 
@@ -73,19 +51,30 @@ class Evaluator:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
 
-        # Perform type checking before evaluation
-        self.type_checker.check_binary_operands(expr.operator, left, right)
-
         if expr.operator.type == TokenType.PLUS:
-            return self.evaluate_addition(left, right)
+            if isinstance(left, str) and isinstance(right, str):
+                return left + right
+            elif isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
+                return Decimal(left) + Decimal(right)
+            else:
+                raise RuntimeError(expr.operator, "Operands must be two numbers or two strings.")
         elif expr.operator.type == TokenType.MINUS:
-            return left - right
+            if isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
+                return Decimal(left) - Decimal(right)
+            else:
+                raise RuntimeError(expr.operator, "Operands must be numbers.")
         elif expr.operator.type == TokenType.STAR:
-            return left * right
+            if isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
+                return Decimal(left) * Decimal(right)
+            else:
+                raise RuntimeError(expr.operator, "Operands must be numbers.")
         elif expr.operator.type == TokenType.SLASH:
-            if right == 0:
-                raise RuntimeError(expr.operator, "Division by zero is not allowed.")
-            return left / right
+            if isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
+                if right == 0:
+                    raise RuntimeError(expr.operator, "Division by zero is not allowed.")
+                return Decimal(left) / Decimal(right)
+            else:
+                raise RuntimeError(expr.operator, "Operands must be numbers.")
         elif expr.operator.type in {
             TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, 
             TokenType.LESS_EQUAL, TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL
@@ -94,16 +83,8 @@ class Evaluator:
         else:
             raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
 
-    def evaluate_addition(self, left, right) -> Union[Decimal, str, None]:
-        if isinstance(left, str) and isinstance(right, str):
-            return left + right
-        elif isinstance(left, Decimal) and isinstance(right, Decimal):
-            return left + right
-        else:
-            raise RuntimeError(None, "Operands must be two numbers or two strings.")
-
     def evaluate_comparison(self, operator: Token, left: Union[Decimal, str], right: Union[Decimal, str]) -> str:
-        if isinstance(left, Decimal) and isinstance(right, Decimal):
+        if isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
             if operator.type == TokenType.GREATER:
                 return "true" if left > right else "false"
             elif operator.type == TokenType.GREATER_EQUAL:
