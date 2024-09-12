@@ -5,7 +5,30 @@ from decimal import Decimal
 from my_parser import Expr
 import sys
 
+class TypeChecker:
+    def check_binary_operands(self, operator: Token, left, right) -> None:
+        if operator.type == TokenType.PLUS:
+            if not ((isinstance(left, str) and isinstance(right, str)) or
+                    (isinstance(left, Decimal) and isinstance(right, Decimal))):
+                raise RuntimeError(operator, "Operands must be two numbers or two strings.")
+        elif operator.type in {
+            TokenType.MINUS, TokenType.STAR, TokenType.SLASH
+        }:
+            if not (isinstance(left, Decimal) and isinstance(right, Decimal)):
+                raise RuntimeError(operator, "Operands must be numbers.")
+        elif operator.type in {
+            TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, 
+            TokenType.LESS_EQUAL, TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL
+        }:
+            if not (isinstance(left, Decimal) and isinstance(right, Decimal)):
+                raise RuntimeError(operator, "Operands must be numbers.")
+        else:
+            raise RuntimeError(operator, f"Unexpected operator: {operator.type}")
+
 class Evaluator:
+    def __init__(self):
+        self.type_checker = TypeChecker()
+
     def evaluate(self, expr: Expr) -> Union[Decimal, str, None]:
         try:
             if isinstance(expr, Expr.Literal):
@@ -41,7 +64,7 @@ class Evaluator:
         if expr.operator.type == TokenType.BANG:
             return "false" if right in ["true", "nil"] else "true"
         elif expr.operator.type == TokenType.MINUS:
-            self.check_number_operand(expr.operator, right)
+            self.type_checker.check_number_operand(expr.operator, right)
             return -right
         else:
             raise RuntimeError(expr.operator, f"Unknown unary operator: {expr.operator}")
@@ -50,18 +73,16 @@ class Evaluator:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
 
-        if expr.operator.type == TokenType.PLUS:
-            self.check_addition_operands(left, right)
-            return self.evaluate_addition(left, right)
+        # Perform type checking before evaluation
+        self.type_checker.check_binary_operands(expr.operator, left, right)
 
-        if expr.operator.type == TokenType.MINUS:
-            self.check_number_operands(expr.operator, left, right)
+        if expr.operator.type == TokenType.PLUS:
+            return self.evaluate_addition(left, right)
+        elif expr.operator.type == TokenType.MINUS:
             return left - right
         elif expr.operator.type == TokenType.STAR:
-            self.check_number_operands(expr.operator, left, right)
             return left * right
         elif expr.operator.type == TokenType.SLASH:
-            self.check_number_operands(expr.operator, left, right)
             if right == 0:
                 raise RuntimeError(expr.operator, "Division by zero is not allowed.")
             return left / right
@@ -81,11 +102,6 @@ class Evaluator:
         else:
             raise RuntimeError(None, "Operands must be two numbers or two strings.")
 
-    def check_addition_operands(self, left, right) -> None:
-        if not ((isinstance(left, str) and isinstance(right, str)) or
-                (isinstance(left, Decimal) and isinstance(right, Decimal))):
-            raise RuntimeError(None, "Operands must be two numbers or two strings.")
-
     def evaluate_comparison(self, operator: Token, left: Union[Decimal, str], right: Union[Decimal, str]) -> str:
         if isinstance(left, Decimal) and isinstance(right, Decimal):
             if operator.type == TokenType.GREATER:
@@ -102,14 +118,6 @@ class Evaluator:
                 return "true" if left != right else "false"
         else:
             raise RuntimeError(operator, "Operands must be numbers.")
-
-    def check_number_operands(self, operator: Token, left: object, right: object) -> None:
-        if not isinstance(left, Decimal) or not isinstance(right, Decimal):
-            raise RuntimeError(operator, f"Operands must be numbers. Found types: {type(left).__name__} and {type(right).__name__}")
-
-    def check_number_operand(self, operator: Token, operand: object) -> None:
-        if not isinstance(operand, Decimal):
-            raise RuntimeError(operator, f"Operand must be a number. Found type: {type(operand).__name__}")
 
     def runtime_error(self, error: RuntimeError) -> None:
         print(f"{error.args[1]}\n[line {error.operator.line}]", file=sys.stderr)
