@@ -55,15 +55,16 @@ class Evaluator:
         right = self.evaluate(expr.right)
 
         if expr.operator == '+':
-            # Explicitly check that both are either strings or numbers
+            # Check if both are strings
             if isinstance(left, str) and isinstance(right, str):
                 return left + right
+            # Check if both are numbers
             elif isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 result = left + right
                 return int(result) if isinstance(result, float) and result.is_integer() else result
             else:
-                # Raise runtime error when types are incompatible
-                self.runtime_error(f"Operands of different or invalid types: '{type(left).__name__}' + '{type(right).__name__}'")
+                # Raise error if incompatible types (like string + boolean)
+                self.runtime_error(f"Invalid types for '+': {type(left).__name__} and {type(right).__name__}")
         
         elif expr.operator == '-':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
@@ -120,6 +121,7 @@ class Evaluator:
         
         else:
             self.runtime_error(f"Unexpected binary operator: {expr.operator}")
+
 
 
     def runtime_error(self, message: str) -> None:
