@@ -79,7 +79,6 @@ class Evaluator:
         else:
             raise RuntimeError(None, "Operands must be two numbers or two strings.")
 
-
     def evaluate_comparison(self, operator: Token, left: Union[Decimal, str], right: Union[Decimal, str]) -> str:
         if isinstance(left, Decimal) and isinstance(right, Decimal):
             if operator.type == TokenType.GREATER:
