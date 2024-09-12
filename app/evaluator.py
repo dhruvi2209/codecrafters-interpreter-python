@@ -27,8 +27,21 @@ class Evaluator:
         right = self.evaluate(expr.right)
 
         if expr.operator.type == TokenType.PLUS:
-            self.__checkStringOrNumberOperands(left, right)
-            return left + right
+            print(f"left: 1 {left} ({type(left)}), right: {right} ({type(right)})")
+            if isinstance(left, str) and isinstance(right, str):
+                print(f"left: 2 {left} ({type(left)}), right: {right} ({type(right)})")
+
+                return left + right
+            
+            elif isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
+                print(f"left: 3{left} ({type(left)}), right: {right} ({type(right)})")
+
+                return Decimal(left) + Decimal(right)
+            else:
+                print(f"left: 4{left} ({type(left)}), right: {right} ({type(right)})")
+
+                raise RuntimeError(expr.operator, "Operands must be two numbers or two strings.")
+
             
         elif expr.operator.type == TokenType.MINUS:
             self.__checkNumberOperands(left, right)
