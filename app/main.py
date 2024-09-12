@@ -190,7 +190,7 @@ def main() -> None:
             if result is not None:
                 print(result)
         except RuntimeError as e:
-            print(f"Runtime Error: {e.args[1]}\n[line {e.token.line}]", file=sys.stderr)
+            print(f"Runtime Error: {e}\n[line {e.token.line}]", file=sys.stderr)
             sys.exit(70)
 
     if Lox.had_error:

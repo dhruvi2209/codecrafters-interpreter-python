@@ -64,4 +64,4 @@ class Evaluator:
             raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
 
     def runtime_error(self, error: RuntimeError) -> None:
-        print(f"{error.args[1]}\n[line {error.token.line}]", file=sys.stderr)
+        print(f"{error}\n[line {error.token.line}]", file=sys.stderr)
