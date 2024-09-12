@@ -55,13 +55,15 @@ class Evaluator:
         right = self.evaluate(expr.right)
 
         if expr.operator == '+':
+            # Explicitly check that both are either strings or numbers
             if isinstance(left, str) and isinstance(right, str):
                 return left + right
             elif isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 result = left + right
                 return int(result) if isinstance(result, float) and result.is_integer() else result
             else:
-                self.runtime_error("Operands must be two numbers or two strings.")
+                # Raise runtime error when types are incompatible
+                self.runtime_error(f"Operands of different or invalid types: '{type(left).__name__}' + '{type(right).__name__}'")
         
         elif expr.operator == '-':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
@@ -111,16 +113,10 @@ class Evaluator:
                 self.runtime_error("Operands must be numbers.")
         
         elif expr.operator == '==':
-            if isinstance(left, (float, int, str)) and isinstance(right, (float, int, str)):
-                return "true" if left == right else "false"
-            else:
-                self.runtime_error("Operands must be of the same type.")
+            return "true" if left == right else "false"
         
         elif expr.operator == '!=':
-            if isinstance(left, (float, int, str)) and isinstance(right, (float, int, str)):
-                return "true" if left != right else "false"
-            else:
-                self.runtime_error("Operands must be of the same type.")
+            return "true" if left != right else "false"
         
         else:
             self.runtime_error(f"Unexpected binary operator: {expr.operator}")
