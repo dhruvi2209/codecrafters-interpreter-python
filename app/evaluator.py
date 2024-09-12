@@ -61,8 +61,7 @@ class Evaluator:
                 result = left + right
                 return int(result) if isinstance(result, float) and result.is_integer() else result
             else:
-                # Types are incompatible for addition
-                self.runtime_error("Operands must be two strings or two numbers.")
+                self.runtime_error("Operands must be two numbers or two strings.")
         
         elif expr.operator == '-':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
@@ -125,6 +124,7 @@ class Evaluator:
         
         else:
             self.runtime_error(f"Unexpected binary operator: {expr.operator}")
+
 
     def runtime_error(self, message: str) -> None:
         print(message, file=sys.stderr)
