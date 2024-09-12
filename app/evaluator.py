@@ -3,7 +3,7 @@ from token_types import Token, TokenType
 from runtime_error import RuntimeError
 from decimal import Decimal
 from my_parser import Expr
-import os,sys
+import sys
 
 class Evaluator:
     def evaluate(self, expr: Expr) -> Union[Decimal, str, None]:

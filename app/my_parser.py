@@ -21,7 +21,7 @@ class Expr:
             return self.__repr__()
 
     class Binary:
-        def __init__(self, left, operator: str, right):
+        def __init__(self, left, operator: Token, right):
             self.left = left
             self.operator = operator
             self.right = right
@@ -29,22 +29,16 @@ class Expr:
         def __str__(self):
             left_str = format_expression(self.left)
             right_str = format_expression(self.right)
-            # Change operator to match expected format
-            if self.operator == '!=':
-                operator = '!='
-            elif self.operator == '==':
-                operator = '=='
-            else:
-                operator = self.operator
+            operator = self.operator.lexeme  # Use lexeme to get the operator as a string
             return f"({operator} {left_str} {right_str})"
 
     class Unary:
-        def __init__(self, operator: str, right):
+        def __init__(self, operator: Token, right):
             self.operator = operator
             self.right = right
 
         def __str__(self):
-            return f"({self.operator} {format_expression(self.right)})"
+            return f"({self.operator.lexeme} {format_expression(self.right)})"
 
     class Grouping:
         def __init__(self, expression):
@@ -55,28 +49,26 @@ class Expr:
 
 def format_expression(expr):
     if isinstance(expr, Expr.Unary):
-        # Ensure parentheses around unary expressions
-        return f"({expr.operator} {format_expression(expr.right)})"
+        return f"({expr.operator.lexeme} {format_expression(expr.right)})"
     elif isinstance(expr, Expr.Binary):
         left = format_expression(expr.left)
         right = format_expression(expr.right)
-        return f"({expr.operator} {left} {right})"
+        return f"({expr.operator.lexeme} {left} {right})"
     elif isinstance(expr, Expr.Literal):
         return str(expr)
     elif isinstance(expr, Expr.Grouping):
         return f"(group {format_expression(expr.expression)})"
     else:
         raise ValueError("Unknown expression type.")
+
 def evaluate(expr):
     if isinstance(expr, Expr.Literal):
         if isinstance(expr.value, float):
-            # Print float values with minimal decimal places
             if expr.value.is_integer():
                 print(int(expr.value))
             else:
                 print(expr.value)
         else:
-            # Print strings and other values directly
             print(expr.value)
     else:
         raise ValueError("Unsupported expression type")
@@ -102,13 +94,13 @@ class Parser:
         expr = self.equality()
         if self.match(TokenType.EQUAL):
             value = self.assignment()
-            return Expr.Binary(expr, '=', value)
+            return Expr.Binary(expr, self.previous(), value)  # Pass Token instead of str
         return expr
 
     def equality(self) -> Expr:
         expr = self.comparison()
         while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
-            operator = self.previous().lexeme
+            operator = self.previous()  # Ensure this is a Token
             right = self.comparison()
             expr = Expr.Binary(expr, operator, right)
         return expr
@@ -116,7 +108,7 @@ class Parser:
     def comparison(self) -> Expr:
         expr = self.addition()
         while self.match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL):
-            operator = self.previous().lexeme
+            operator = self.previous()  # Ensure this is a Token
             right = self.addition()
             expr = Expr.Binary(expr, operator, right)
         return expr
@@ -124,7 +116,7 @@ class Parser:
     def addition(self) -> Expr:
         expr = self.multiplication()
         while self.match(TokenType.PLUS, TokenType.MINUS):
-            operator = self.previous().lexeme
+            operator = self.previous()  # Ensure this is a Token
             right = self.multiplication()
             expr = Expr.Binary(expr, operator, right)
         return expr
@@ -132,14 +124,14 @@ class Parser:
     def multiplication(self) -> Expr:
         expr = self.unary()
         while self.match(TokenType.STAR, TokenType.SLASH):
-            operator = self.previous().lexeme
+            operator = self.previous()  # Ensure this is a Token
             right = self.unary()
             expr = Expr.Binary(expr, operator, right)
         return expr
 
     def unary(self) -> Expr:
         if self.match(TokenType.BANG, TokenType.MINUS):
-            operator = self.previous().lexeme
+            operator = self.previous()  # Ensure this is a Token
             operand = self.unary()
             return Expr.Unary(operator, operand)
         return self.primary()
@@ -175,7 +167,7 @@ class Parser:
             self.advance()
         else:
             self.error(self.peek(), message)
-            raise SystemExit(65)  # Exit with code 65 for syntax errors
+            raise SystemExit(65)
 
     def check(self, token_type: str) -> bool:
         if self.is_at_end():
