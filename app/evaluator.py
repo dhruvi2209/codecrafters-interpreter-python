@@ -46,10 +46,28 @@ class Evaluator:
         else:
             raise RuntimeError(expr.operator, f"Unknown unary operator: {expr.operator}")
 
+    def evaluate_addition(self, left, right) -> Union[Decimal, str, None]:
+        if isinstance(left, str) and isinstance(right, str):
+            return left + right
+        elif isinstance(left, Decimal) and isinstance(right, Decimal):
+            return left + right
+        else:
+            raise RuntimeError(None, "Operands must be two numbers or two strings.")
+
     def evaluate_binary(self, expr: Expr.Binary) -> Union[Decimal, str, None]:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
-
+        
+        # Ensure type compatibility
+        if expr.operator.type == TokenType.PLUS:
+            if isinstance(left, str) and isinstance(right, (str, bool)):
+                self.check_string_operands(left, right)
+            elif isinstance(left, (Decimal, bool)) and isinstance(right, (Decimal, bool)):
+                self.check_number_operands(left, right)
+            else:
+                raise RuntimeError(expr.operator, "Operands must be two compatible types for addition.")
+        
+        # Existing binary operator handling
         if expr.operator.type == TokenType.PLUS:
             return self.evaluate_addition(left, right)
         elif expr.operator.type == TokenType.MINUS:
@@ -71,13 +89,6 @@ class Evaluator:
         else:
             raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
 
-    def evaluate_addition(self, left, right) -> Union[Decimal, str, None]:
-        if isinstance(left, str) and isinstance(right, str):
-            return left + right
-        elif isinstance(left, Decimal) and isinstance(right, Decimal):
-            return left + right
-        else:
-            raise RuntimeError(None, "Operands must be two numbers or two strings.")
 
     def evaluate_comparison(self, operator: Token, left: Union[Decimal, str], right: Union[Decimal, str]) -> str:
         if isinstance(left, Decimal) and isinstance(right, Decimal):
@@ -95,14 +106,19 @@ class Evaluator:
                 return "true" if left != right else "false"
         else:
             raise RuntimeError(operator, "Operands must be numbers.")
-
-    def check_number_operands(self, operator: Token, left: object, right: object) -> None:
-        if not isinstance(left, Decimal) or not isinstance(right, Decimal):
-            raise RuntimeError(operator, f"Operands must be numbers. Found types: {type(left).__name__} and {type(right).__name__}")
+        
+    def check_string_operands(self, left, right) -> None:
+        if not isinstance(left, str) or not isinstance(right, str):
+            raise RuntimeError(None, "Operands must be strings.")
 
     def check_number_operand(self, operator: Token, operand: object) -> None:
-        if not isinstance(operand, Decimal):
-            raise RuntimeError(operator, f"Operand must be a number. Found type: {type(operand).__name__}")
+        if not isinstance(operand, (Decimal, bool)):
+            raise RuntimeError(operator, f"Operand must be a number or boolean. Found type: {type(operand).__name__}")
+
+    def check_number_operands(self, operator: Token, left: object, right: object) -> None:
+        if not isinstance(left, (Decimal, bool)) or not isinstance(right, (Decimal, bool)):
+            raise RuntimeError(operator, f"Operands must be numbers or booleans. Found types: {type(left).__name__} and {type(right).__name__}")
+
 
     def runtime_error(self, error: RuntimeError) -> None:
         print(f"{error.args[1]}\n[line {error.operator.line}]", file=sys.stderr)
