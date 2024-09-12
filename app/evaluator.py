@@ -39,7 +39,14 @@ class Evaluator:
     def evaluate_unary(self, expr: Expr.Unary) -> Union[Decimal, str, None]:
         right = self.evaluate(expr.right)
         if expr.operator.type == TokenType.BANG:
-            return "false" if right in ["true", "nil"] else "true"
+            if right == "true":
+                return "false"
+            elif right == "false" or right == "nil":
+                return "true"
+            elif isinstance(right, (Decimal, int)):
+                return "false"
+            else:
+                raise RuntimeError(expr.operator, "Invalid operand type for unary '!'")
         elif expr.operator.type == TokenType.MINUS:
             if not isinstance(right, (Decimal, int)):
                 raise RuntimeError(expr.operator, "Operand must be a number.")
@@ -58,16 +65,19 @@ class Evaluator:
                 return Decimal(left) + Decimal(right)
             else:
                 raise RuntimeError(expr.operator, "Operands must be two numbers or two strings.")
+        
         elif expr.operator.type == TokenType.MINUS:
             if isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
                 return Decimal(left) - Decimal(right)
             else:
                 raise RuntimeError(expr.operator, "Operands must be numbers.")
+        
         elif expr.operator.type == TokenType.STAR:
             if isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
                 return Decimal(left) * Decimal(right)
             else:
                 raise RuntimeError(expr.operator, "Operands must be numbers.")
+        
         elif expr.operator.type == TokenType.SLASH:
             if isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
                 if right == 0:
@@ -75,11 +85,13 @@ class Evaluator:
                 return Decimal(left) / Decimal(right)
             else:
                 raise RuntimeError(expr.operator, "Operands must be numbers.")
+        
         elif expr.operator.type in {
             TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, 
             TokenType.LESS_EQUAL, TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL
         }:
             return self.evaluate_comparison(expr.operator, left, right)
+        
         else:
             raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
 
