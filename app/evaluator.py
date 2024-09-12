@@ -24,10 +24,13 @@ class Evaluator:
         except RuntimeError as e:
             self.runtime_error(e)
             had_runtime_error = True
-            sys.exit(70)  # Exit with code 70 for runtime errors
+            print("Exiting with code 70 due to RuntimeError")  # Debug statement
+            sys.exit(70)  # Ensure we exit with code 70
         except Exception as e:
             # Handle unexpected exceptions
             print(f"Unexpected error: {e}", file=sys.stderr)
+            had_runtime_error = True
+            print("Exiting with code 70 due to unexpected error")  # Debug statement
             sys.exit(70)
 
     def evaluate_binary(self, expr: Expr.Binary) -> Union[Decimal, str, None]:
@@ -62,7 +65,8 @@ class Evaluator:
                 raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
         except RuntimeError as e:
             self.runtime_error(e)
-            sys.exit(70)  # Ensure exit code 70 for runtime errors
+            print("Exiting with code 70 due to RuntimeError in binary evaluation")  # Debug statement
+            sys.exit(70)  # Ensure we exit with code 70
 
     def __checkNumberOperands(self, left, right):
         if not (isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int))):
