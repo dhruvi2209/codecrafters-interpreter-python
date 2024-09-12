@@ -27,42 +27,32 @@ class Evaluator:
         right = self.evaluate(expr.right)
 
         if expr.operator.type == TokenType.PLUS:
-            print(f"left: 1 {left} ({type(left)}), right: {right} ({type(right)})")
+            self.__checkStringOrNumberOperands(left, right)
             if isinstance(left, str) and isinstance(right, str):
-                print(f"left: 2 {left} ({type(left)}), right: {right} ({type(right)})")
-
                 return left + right
-            
-            elif isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
-                print(f"left: 3{left} ({type(left)}), right: {right} ({type(right)})")
-
+            else:  # Already checked, so should be either both numbers
                 return Decimal(left) + Decimal(right)
-            else:
-                print(f"left: 4{left} ({type(left)}), right: {right} ({type(right)})")
 
-                raise RuntimeError(expr.operator, "Operands must be two numbers or two strings.")
-
-            
         elif expr.operator.type == TokenType.MINUS:
             self.__checkNumberOperands(left, right)
             return Decimal(left) - Decimal(right)
-            
+
         elif expr.operator.type == TokenType.STAR:
             self.__checkNumberOperands(left, right)
             return Decimal(left) * Decimal(right)
-            
+
         elif expr.operator.type == TokenType.SLASH:
             self.__checkNumberOperands(left, right)
             if right == 0:
                 raise RuntimeError(expr.operator, "Division by zero is not allowed.")
             return Decimal(left) / Decimal(right)
-            
+
         elif expr.operator.type in {
-            TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, 
+            TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS,
             TokenType.LESS_EQUAL, TokenType.EQUAL_EQUAL, TokenType.BANG_EQUAL
         }:
             return self.evaluate_comparison(expr.operator, left, right)
-            
+
         else:
             raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
 
@@ -71,6 +61,9 @@ class Evaluator:
                 (isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)))):
             raise RuntimeError("Operands must be two numbers or two strings.")
 
+    def __checkNumberOperands(self, left, right):
+        if not (isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int))):
+            raise RuntimeError("Operands must be numbers.")
 
     def runtime_error(self, error: RuntimeError) -> None:
         print(f"{error}\n[line {error.token.line}]", file=sys.stderr)
