@@ -49,13 +49,11 @@ class Evaluator:
     def evaluate_binary(self, expr: Expr.Binary) -> Union[Decimal, str, None]:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
-        
-        # Ensure type compatibility for `+` operator
+
         if expr.operator.type == TokenType.PLUS:
             self.check_addition_operands(left, right)
             return self.evaluate_addition(left, right)
-        
-        # Handle other operators
+
         if expr.operator.type == TokenType.MINUS:
             self.check_number_operands(expr.operator, left, right)
             return left - right
