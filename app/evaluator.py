@@ -87,11 +87,11 @@ class Evaluator:
 
     def check_number_operands(self, left, right) -> None:
         if not isinstance(left, (float, int)) or not isinstance(right, (float, int)):
-            self.runtime_error("Operands must be numbers.")
+            self.runtime_error(f"Operands must be numbers. Found types: {type(left).__name__} and {type(right).__name__}")
 
     def check_number_operand(self, operand) -> None:
         if not isinstance(operand, (float, int)):
-            self.runtime_error("Operand must be a number.")
+            self.runtime_error(f"Operand must be a number. Found type: {type(operand).__name__}")
 
     def runtime_error(self, message: str) -> None:
         print(message, file=sys.stderr)
