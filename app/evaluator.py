@@ -20,7 +20,8 @@ class Evaluator:
                 raise ValueError(f"Unexpected expression type: {type(expr)}")
         except RuntimeError as e:
             self.runtime_error(e)
-            sys.exit(70)  # Ensure we exit with code 70 for runtime errors
+            sys.exit(70)  # Exit with code 70 for runtime errors
+
 
     def evaluate_binary(self, expr: Expr.Binary) -> Union[Decimal, str, None]:
         left = self.evaluate(expr.left)
