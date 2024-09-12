@@ -12,5 +12,5 @@ class Lox:
 
     @staticmethod
     def runtime_error(error: RuntimeError) -> None:
-        print(f"{error}\n[line {error.token.line}]", file=sys.stderr)
+        print(f"{error}\n[line {error.line}]", file=sys.stderr)
         Lox.had_runtime_error = True

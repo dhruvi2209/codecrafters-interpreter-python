@@ -272,12 +272,14 @@ def main() -> None:
             result = evaluator.evaluate(expr)
             if result is not None:
                 print(result)
-        except RuntimeError as e:
-            print(f"Runtime Error: {e}", file=sys.stderr)
+        except RuntimeError:
+            # RuntimeError is already handled by the Lox class
             sys.exit(70)
 
     if Lox.had_error:
         sys.exit(65)
+    if Lox.had_runtime_error:
+        sys.exit(70)
 
 if __name__ == "__main__":
     main()

@@ -1,20 +1,25 @@
 from typing import Union
 from my_parser import Expr
 from runtime_error import RuntimeError  # Import the custom RuntimeError
+from lox import Lox  # Import Lox to use runtime_error
 import sys
 
 class Evaluator:
     def evaluate(self, expr: Expr) -> Union[float, str, None]:
-        if isinstance(expr, Expr.Literal):
-            return self.evaluate_literal(expr)
-        elif isinstance(expr, Expr.Unary):
-            return self.evaluate_unary(expr)
-        elif isinstance(expr, Expr.Binary):
-            return self.evaluate_binary(expr)
-        elif isinstance(expr, Expr.Grouping):
-            return self.evaluate(expr.expression)
-        else:
-            raise ValueError(f"Unexpected expression type: {type(expr)}")
+        try:
+            if isinstance(expr, Expr.Literal):
+                return self.evaluate_literal(expr)
+            elif isinstance(expr, Expr.Unary):
+                return self.evaluate_unary(expr)
+            elif isinstance(expr, Expr.Binary):
+                return self.evaluate_binary(expr)
+            elif isinstance(expr, Expr.Grouping):
+                return self.evaluate(expr.expression)
+            else:
+                raise ValueError(f"Unexpected expression type: {type(expr)}")
+        except RuntimeError as e:
+            Lox.runtime_error(e)
+            raise  # Re-raise to ensure the exit code can be set in `main()`
 
     def evaluate_literal(self, expr: Expr.Literal) -> Union[float, str, None]:
         if expr.value is True:
