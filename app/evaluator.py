@@ -65,7 +65,7 @@ class Evaluator:
                 return int(result) if isinstance(result, float) and result.is_integer() else result
             else:
                 self.runtime_error("Operands must be two numbers or two strings.")
-    
+        
         elif expr.operator == '-':
             if isinstance(left, (float, int)) and isinstance(right, (float, int)):
                 result = left - right
