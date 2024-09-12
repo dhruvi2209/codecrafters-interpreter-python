@@ -5,7 +5,7 @@ class TokenType:
     RIGHT_PAREN = 'RIGHT_PAREN'
     LEFT_BRACE = 'LEFT_BRACE'
     RIGHT_BRACE = 'RIGHT_BRACE'
-    COMMA = 'COMMA'
+    COMMA = 'COMMA' 
     DOT = 'DOT'
     MINUS = 'MINUS'
     PLUS = 'PLUS'

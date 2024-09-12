@@ -22,38 +22,6 @@ class Evaluator:
             self.runtime_error(e)
             sys.exit(70)  # Ensure we exit with code 70 for runtime errors
 
-    def evaluate_literal(self, expr: Expr.Literal) -> Union[Decimal, str, None]:
-        if expr.value is True:
-            return "true"
-        elif expr.value is False:
-            return "false"
-        elif expr.value is None:
-            return "nil"
-        elif isinstance(expr.value, (int, float)):
-            return Decimal(expr.value)
-        elif isinstance(expr.value, str):
-            return expr.value
-        else:
-            raise ValueError(f"Unexpected literal value: {expr.value}")
-
-    def evaluate_unary(self, expr: Expr.Unary) -> Union[Decimal, str, None]:
-        right = self.evaluate(expr.right)
-        if expr.operator.type == TokenType.BANG:
-            if right == "true":
-                return "false"
-            elif right == "false" or right == "nil":
-                return "true"
-            elif isinstance(right, (Decimal, int)):
-                return "false"
-            else:
-                raise RuntimeError(expr.operator, "Invalid operand type for unary '!'")
-        elif expr.operator.type == TokenType.MINUS:
-            if not isinstance(right, (Decimal, int)):
-                raise RuntimeError(expr.operator, "Operand must be a number.")
-            return -Decimal(right)
-        else:
-            raise RuntimeError(expr.operator, f"Unknown unary operator: {expr.operator}")
-
     def evaluate_binary(self, expr: Expr.Binary) -> Union[Decimal, str, None]:
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
@@ -95,22 +63,5 @@ class Evaluator:
         else:
             raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
 
-    def evaluate_comparison(self, operator: Token, left: Union[Decimal, str], right: Union[Decimal, str]) -> str:
-        if isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
-            if operator.type == TokenType.GREATER:
-                return "true" if left > right else "false"
-            elif operator.type == TokenType.GREATER_EQUAL:
-                return "true" if left >= right else "false"
-            elif operator.type == TokenType.LESS:
-                return "true" if left < right else "false"
-            elif operator.type == TokenType.LESS_EQUAL:
-                return "true" if left <= right else "false"
-            elif operator.type == TokenType.EQUAL_EQUAL:
-                return "true" if left == right else "false"
-            elif operator.type == TokenType.BANG_EQUAL:
-                return "true" if left != right else "false"
-        else:
-            raise RuntimeError(operator, "Operands must be numbers.")
-
     def runtime_error(self, error: RuntimeError) -> None:
-        print(f"{error.args[1]}\n[line {error.operator.line}]", file=sys.stderr)
+        print(f"{error.args[1]}\n[line {error.token.line}]", file=sys.stderr)
