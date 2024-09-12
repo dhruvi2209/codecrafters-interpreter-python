@@ -10,6 +10,7 @@ from lox import Lox
 from my_parser import Parser
 from my_parser import Expr
 
+from runtime_error import RuntimeError
 
 
 # # Define Token Types
@@ -272,9 +273,8 @@ def main() -> None:
             if result is not None:
                 print(result)
         except RuntimeError as e:
-            print(e)
-            sys.exit(70)  # Exit code for runtime errors
-
+            print(f"Runtime Error: {e}", file=sys.stderr)
+            sys.exit(70)
 
     if Lox.had_error:
         sys.exit(65)

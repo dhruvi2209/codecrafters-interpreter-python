@@ -1,5 +1,6 @@
 from typing import Union
 from my_parser import Expr
+from runtime_error import RuntimeError  # Import the custom RuntimeError
 import sys
 
 class Evaluator:
@@ -39,7 +40,7 @@ class Evaluator:
             self.check_number_operand(expr.right)
             return -right
         else:
-            self.runtime_error(f"Unknown unary operator: {expr.operator}")
+            raise RuntimeError(expr.operator, f"Unknown unary operator: {expr.operator}")
 
     def evaluate_binary(self, expr: Expr.Binary) -> Union[float, str, None]:
         left = self.evaluate(expr.left)
@@ -56,7 +57,7 @@ class Evaluator:
         elif expr.operator == '/':
             self.check_number_operands(left, right)
             if right == 0:
-                self.runtime_error("Division by zero is not allowed.")
+                raise RuntimeError(expr.operator, "Division by zero is not allowed.")
             return left / right
         elif expr.operator == '>':
             self.check_number_operands(left, right)
@@ -75,7 +76,7 @@ class Evaluator:
         elif expr.operator == '!=':
             return "true" if left != right else "false"
         else:
-            self.runtime_error(f"Unexpected binary operator: {expr.operator}")
+            raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
 
     def evaluate_addition(self, left, right) -> Union[float, str, None]:
         if isinstance(left, str) and isinstance(right, str):
@@ -83,16 +84,12 @@ class Evaluator:
         elif isinstance(left, (float, int)) and isinstance(right, (float, int)):
             return left + right
         else:
-            self.runtime_error(f"Invalid types for '+': {type(left).__name__} and {type(right).__name__}")
+            raise RuntimeError(None, "Operands must be two numbers or two strings.")
 
     def check_number_operands(self, left, right) -> None:
         if not isinstance(left, (float, int)) or not isinstance(right, (float, int)):
-            self.runtime_error(f"Operands must be numbers. Found types: {type(left).__name__} and {type(right).__name__}")
+            raise RuntimeError(None, f"Operands must be numbers. Found types: {type(left).__name__} and {type(right).__name__}")
 
     def check_number_operand(self, operand) -> None:
         if not isinstance(operand, (float, int)):
-            self.runtime_error(f"Operand must be a number. Found type: {type(operand).__name__}")
-
-    def runtime_error(self, message: str) -> None:
-        print(message, file=sys.stderr)
-        sys.exit(70)
+            raise RuntimeError(None, f"Operand must be a number. Found type: {type(operand).__name__}")
