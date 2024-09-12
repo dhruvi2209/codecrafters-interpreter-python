@@ -5,8 +5,12 @@ from decimal import Decimal
 from my_parser import Expr
 import sys
 
+# Global variable to track if a runtime error has occurred
+had_runtime_error = False
+
 class Evaluator:
     def evaluate(self, expr: Expr) -> Union[Decimal, str, None]:
+        global had_runtime_error
         try:
             if isinstance(expr, Expr.Literal):
                 return self.evaluate_literal(expr)
@@ -20,6 +24,7 @@ class Evaluator:
                 raise ValueError(f"Unexpected expression type: {type(expr)}")
         except RuntimeError as e:
             self.runtime_error(e)
+            had_runtime_error = True
             sys.exit(70)  # Exit with code 70 for runtime errors
 
     def evaluate_binary(self, expr: Expr.Binary) -> Union[Decimal, str, None]:
@@ -27,11 +32,12 @@ class Evaluator:
         right = self.evaluate(expr.right)
 
         if expr.operator.type == TokenType.PLUS:
-            self.__checkStringOrNumberOperands(left, right)
             if isinstance(left, str) and isinstance(right, str):
                 return left + right
-            else:  # Already checked, so should be either both numbers
+            elif isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)):
                 return Decimal(left) + Decimal(right)
+            else:
+                raise RuntimeError(expr.operator, "Operands must be two numbers or two strings.")
 
         elif expr.operator.type == TokenType.MINUS:
             self.__checkNumberOperands(left, right)
@@ -56,14 +62,12 @@ class Evaluator:
         else:
             raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
 
-    def __checkStringOrNumberOperands(self, left, right):
-        if not ((isinstance(left, str) and isinstance(right, str)) or 
-                (isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int)))):
-            raise RuntimeError("Operands must be two numbers or two strings.")
-
     def __checkNumberOperands(self, left, right):
         if not (isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int))):
             raise RuntimeError("Operands must be numbers.")
 
     def runtime_error(self, error: RuntimeError) -> None:
+        # Print the error message to stderr and mark that an error occurred
         print(f"{error}\n[line {error.token.line}]", file=sys.stderr)
+        global had_runtime_error
+        had_runtime_error = True
