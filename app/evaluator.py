@@ -34,19 +34,10 @@ class Evaluator:
     def evaluate_unary(self, expr: Expr.Unary) -> Union[float, str, None]:
         right = self.evaluate(expr.right)
         if expr.operator == '!':
-            if right == "true":
-                return "false"
-            elif right == "false" or right == "nil":
-                return "true"
-            elif isinstance(right, (float, int)):
-                return "false"
-            else:
-                self.runtime_error("Invalid operand type for unary '!'")
+            return "false" if right in ["true", None] else "true"
         elif expr.operator == '-':
-            if isinstance(right, (float, int)):
-                return -right
-            else:
-                self.runtime_error("Invalid operand type for unary '-'")
+            self.check_number_operand(expr.right)
+            return -right
         else:
             self.runtime_error(f"Unknown unary operator: {expr.operator}")
 
@@ -55,74 +46,52 @@ class Evaluator:
         right = self.evaluate(expr.right)
 
         if expr.operator == '+':
-            # Check if both are strings
-            if isinstance(left, str) and isinstance(right, str):
-                return left + right
-            # Check if both are numbers
-            elif isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                result = left + right
-                return int(result) if isinstance(result, float) and result.is_integer() else result
-            else:
-                # Raise error if incompatible types (like string + boolean)
-                self.runtime_error(f"Invalid types for '+': {type(left).__name__} and {type(right).__name__}")
-        
+            return self.evaluate_addition(left, right)
         elif expr.operator == '-':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                result = left - right
-                return int(result) if isinstance(result, float) and result.is_integer() else result
-            else:
-                self.runtime_error("Operands must be numbers.")
-        
+            self.check_number_operands(left, right)
+            return left - right
         elif expr.operator == '*':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                result = left * right
-                return int(result) if result.is_integer() else result
-            else:
-                self.runtime_error("Operands must be numbers.")
-        
+            self.check_number_operands(left, right)
+            return left * right
         elif expr.operator == '/':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                if right == 0:
-                    self.runtime_error("Division by zero is not allowed.")
-                result = left / right
-                return int(result) if result.is_integer() else result
-            else:
-                self.runtime_error("Operands must be numbers.")
-        
+            self.check_number_operands(left, right)
+            if right == 0:
+                self.runtime_error("Division by zero is not allowed.")
+            return left / right
         elif expr.operator == '>':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return "true" if left > right else "false"
-            else:
-                self.runtime_error("Operands must be numbers.")
-        
+            self.check_number_operands(left, right)
+            return "true" if left > right else "false"
         elif expr.operator == '<':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return "true" if left < right else "false"
-            else:
-                self.runtime_error("Operands must be numbers.")
-        
+            self.check_number_operands(left, right)
+            return "true" if left < right else "false"
         elif expr.operator == '>=':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return "true" if left >= right else "false"
-            else:
-                self.runtime_error("Operands must be numbers.")
-        
+            self.check_number_operands(left, right)
+            return "true" if left >= right else "false"
         elif expr.operator == '<=':
-            if isinstance(left, (float, int)) and isinstance(right, (float, int)):
-                return "true" if left <= right else "false"
-            else:
-                self.runtime_error("Operands must be numbers.")
-        
+            self.check_number_operands(left, right)
+            return "true" if left <= right else "false"
         elif expr.operator == '==':
             return "true" if left == right else "false"
-        
         elif expr.operator == '!=':
             return "true" if left != right else "false"
-        
         else:
             self.runtime_error(f"Unexpected binary operator: {expr.operator}")
 
+    def evaluate_addition(self, left, right) -> Union[float, str, None]:
+        if isinstance(left, str) and isinstance(right, str):
+            return left + right
+        elif isinstance(left, (float, int)) and isinstance(right, (float, int)):
+            return left + right
+        else:
+            self.runtime_error(f"Invalid types for '+': {type(left).__name__} and {type(right).__name__}")
 
+    def check_number_operands(self, left, right) -> None:
+        if not isinstance(left, (float, int)) or not isinstance(right, (float, int)):
+            self.runtime_error("Operands must be numbers.")
+
+    def check_number_operand(self, operand) -> None:
+        if not isinstance(operand, (float, int)):
+            self.runtime_error("Operand must be a number.")
 
     def runtime_error(self, message: str) -> None:
         print(message, file=sys.stderr)
