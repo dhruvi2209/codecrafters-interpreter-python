@@ -29,7 +29,7 @@ class Expr:
         def __str__(self):
             left_str = format_expression(self.left)
             right_str = format_expression(self.right)
-            operator = self.operator.lexeme  # Use lexeme to get the operator as a string
+            operator = self.operator.lexeme 
             return f"({operator} {left_str} {right_str})"
 
     class Unary:
@@ -94,13 +94,13 @@ class Parser:
         expr = self.equality()
         if self.match(TokenType.EQUAL):
             value = self.assignment()
-            return Expr.Binary(expr, self.previous(), value)  # Pass Token instead of str
+            return Expr.Binary(expr, self.previous(), value)  
         return expr
 
     def equality(self) -> Expr:
         expr = self.comparison()
         while self.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
-            operator = self.previous()  # Ensure this is a Token
+            operator = self.previous()  
             right = self.comparison()
             expr = Expr.Binary(expr, operator, right)
         return expr
@@ -108,7 +108,7 @@ class Parser:
     def comparison(self) -> Expr:
         expr = self.addition()
         while self.match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL):
-            operator = self.previous()  # Ensure this is a Token
+            operator = self.previous() 
             right = self.addition()
             expr = Expr.Binary(expr, operator, right)
         return expr
@@ -116,7 +116,7 @@ class Parser:
     def addition(self) -> Expr:
         expr = self.multiplication()
         while self.match(TokenType.PLUS, TokenType.MINUS):
-            operator = self.previous()  # Ensure this is a Token
+            operator = self.previous() 
             right = self.multiplication()
             expr = Expr.Binary(expr, operator, right)
         return expr
@@ -124,14 +124,14 @@ class Parser:
     def multiplication(self) -> Expr:
         expr = self.unary()
         while self.match(TokenType.STAR, TokenType.SLASH):
-            operator = self.previous()  # Ensure this is a Token
+            operator = self.previous()  
             right = self.unary()
             expr = Expr.Binary(expr, operator, right)
         return expr
 
     def unary(self) -> Expr:
         if self.match(TokenType.BANG, TokenType.MINUS):
-            operator = self.previous()  # Ensure this is a Token
+            operator = self.previous() 
             operand = self.unary()
             return Expr.Unary(operator, operand)
         return self.primary()

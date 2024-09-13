@@ -5,7 +5,6 @@ from decimal import Decimal
 from my_parser import Expr
 import sys
 
-# Global variable to track if a runtime error has occurred
 had_runtime_error = False
 class Evaluator:
     def evaluate(self, expr: Expr) -> Union[Decimal, str, None]:
@@ -24,13 +23,13 @@ class Evaluator:
         except RuntimeError as e:
             self.runtime_error(e)
             had_runtime_error = True
-            print("Exiting with code 70 due to RuntimeError")  # Debug statement
-            sys.exit(70)  # Ensure we exit with code 70
+            print("Exiting with code 70 due to RuntimeError")  
+            sys.exit(70)  
         except Exception as e:
-            # Handle unexpected exceptions
+          
             print(f"Unexpected error: {e}", file=sys.stderr)
             had_runtime_error = True
-            print("Exiting with code 70 due to unexpected error")  # Debug statement
+            print("Exiting with code 70 due to unexpected error")  
             sys.exit(70)
 
     def evaluate_binary(self, expr: Expr.Binary) -> Union[Decimal, str, None]:
@@ -65,15 +64,14 @@ class Evaluator:
                 raise RuntimeError(expr.operator, f"Unexpected binary operator: {expr.operator}")
         except RuntimeError as e:
             self.runtime_error(e)
-            print("Exiting with code 70 due to RuntimeError in binary evaluation")  # Debug statement
-            sys.exit(70)  # Ensure we exit with code 70
+            print("Exiting with code 70 due to RuntimeError in binary evaluation")  
+            sys.exit(70) 
 
     def __checkNumberOperands(self, left, right):
         if not (isinstance(left, (Decimal, int)) and isinstance(right, (Decimal, int))):
             raise RuntimeError("Operands must be numbers.")
 
     def runtime_error(self, error: RuntimeError) -> None:
-        # Print the error message to stderr and mark that an error occurred
         print(f"{error}\n[line {error.token.line}]", file=sys.stderr)
         global had_runtime_error
         had_runtime_error = True
